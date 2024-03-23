@@ -8,10 +8,16 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      colors: {
+        spotify: {
+          base: "#121212",
+          highlight: "#1a1a1a",
+          dark: "#0a0a0a",
+          subdued: "#727272",
+          gray: "#a7a7a7",
+          green: "#1ed760",
+          press: "#169c46",
+        },
       },
     },
   },

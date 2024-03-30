@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 html {
-  background-color: #000;
+  background-color: #121212;
   color: #fff;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }

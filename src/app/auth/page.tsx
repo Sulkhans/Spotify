@@ -42,12 +42,35 @@ export default function Auth() {
   };
   return loading ? (
     <Loading />
-  ) : token ? (
-    <div>yay</div>
   ) : (
-    <div>
-      <Spotify className=" fill-white" />
-      <button onClick={handleConnect}>connect</button>
+    <div className="p-8 md:px-12 h-screen">
+      <Spotify className="w-20 md:w-32 fill-white" />
+      <main className="py-8 h-[90%] flex flex-col items-center md:justify-center">
+        {token ? (
+          <></>
+        ) : (
+          <>
+            <p className="text-3xl font-bold md:text-5xl">Log in to Spotify</p>
+            <button
+              onClick={handleConnect}
+              className="w-full md:max-w-80 rounded-full p-3 px-8 my-8 md:mt-10 bg-spotify-green active:bg-spotify-press hover:scale-105 text-black font-semibold"
+            >
+              Connect to Spotify
+            </button>
+            <a
+              href="https://accounts.spotify.com/en/password-reset"
+              className="underline"
+            >
+              Forgot your password?
+            </a>
+            <hr className="w-full md:w-2/3 my-8 border-[#292929]" />
+            <p className="text-spotify-gray mb-1">Don't have an account?</p>
+            <a href="https://www.spotify.com/ge/signup" className="underline">
+              Sign up for Spotify
+            </a>
+          </>
+        )}
+      </main>
     </div>
   );
 }

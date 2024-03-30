@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Wix_Madefor_Text } from "next/font/google";
-import { UserProvider } from "@/utils/context";
 import "./globals.css";
 
 const wix = Wix_Madefor_Text({ subsets: ["cyrillic"] });
@@ -21,9 +20,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" type="image/svg+xml" href="/icon.svg" />
       </head>
-      <body className={wix.className}>
-        <UserProvider>{children}</UserProvider>
-      </body>
+      <body className={wix.className}>{children}</body>
     </html>
   );
 }

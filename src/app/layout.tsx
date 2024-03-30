@@ -6,7 +6,8 @@ const wix = Wix_Madefor_Text({ subsets: ["cyrillic"] });
 
 export const metadata: Metadata = {
   title: "Spotify",
-  description: "Next.js spotify clone",
+  description:
+    "Spotify is a digital music service that gives you access to millions of songs.",
 };
 
 export default function RootLayout({
@@ -17,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" type="image/svg+xml" href="/spotify.svg" />
+        <link rel="icon" type="image/svg+xml" href="/icon.svg" />
       </head>
       <body className={wix.className}>{children}</body>
     </html>

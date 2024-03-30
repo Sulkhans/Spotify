@@ -1,26 +1,43 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { setToken, getToken } from "@/cookie.js";
+import { setToken, getToken, removeToken } from "@/utils/cookie.js";
+import { UserType } from "@/utils/types";
 import Loading from "@/components/Loading";
 //@ts-ignore
 import Spotify from "@/assets/spotify.svg";
 
 export default function Auth() {
+  const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
   const token = getToken();
 
   useEffect(() => {
-    if (!token) {
+    if (token) {
+      fetch("https://api.spotify.com/v1/me", {
+        method: "GET",
+        headers: { Authorization: "Bearer " + token },
+      })
+        .then((res) => res.json())
+        .then(({ id, display_name, email, images }) =>
+          setUser({ id, name: display_name, email, image: images[1].url })
+        )
+        .catch((err) => console.error(err));
+    } else {
       const getTokenFromHash = () => {
         const hash = window.location.hash.substring(1);
         const params = new URLSearchParams(hash);
         return params.get("access_token");
       };
       const accessToken = getTokenFromHash();
-      if (accessToken) setToken(accessToken);
+      if (accessToken) {
+        setToken(accessToken);
+        router.replace("/auth");
+      }
     }
     setLoading(false);
-  }, []);
+  }, [token]);
 
   const handleConnect = () => {
     const url = "https://accounts.spotify.com/authorize";
@@ -40,14 +57,45 @@ export default function Auth() {
       " "
     )}&response_type=token&show_daialog=true`;
   };
+
+  const handleLogOut = () => {
+    removeToken();
+    setUser(null);
+    window.location.reload();
+  };
+
   return loading ? (
     <Loading />
   ) : (
     <div className="p-8 md:px-12 h-screen">
-      <Spotify className="w-20 md:w-32 fill-white" />
+      <Spotify
+        className="w-20 md:w-32 fill-white"
+        onClick={() => router.push("/")}
+      />
       <main className="py-8 h-[90%] flex flex-col items-center md:justify-center">
         {token ? (
-          <></>
+          user && (
+            <>
+              <p className="text-3xl md:text-4xl font-bold">Logged in as</p>
+              <div
+                style={{ backgroundImage: `url(${user.image})` }}
+                className={`size-28 bg-cover bg-center rounded-full mt-12 mb-4`}
+              />
+              <p>{user.name}</p>
+              <button
+                onClick={() => router.push("/")}
+                className="w-full md:max-w-72 rounded-full p-3 mb-8 mt-10 bg-spotify-green active:bg-spotify-press hover:scale-105 text-black font-bold tracking-wide"
+              >
+                Web Player
+              </button>
+              <button
+                onClick={handleLogOut}
+                className="font-semibold text-spotify-gray hover:text-white hover:scale-105"
+              >
+                Log Out
+              </button>
+            </>
+          )
         ) : (
           <>
             <p className="text-3xl font-bold md:text-5xl">Log in to Spotify</p>

@@ -7,10 +7,10 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="p-2 w-screen bg-black">
-      <div className="flex gap-2">
+    <div className="w-screen h-[100dvh] p-2 flex flex-col gap-2 bg-black">
+      <div className="flex gap-2 h-full">
         <Sidebar />
-        <main>{children}</main>
+        <main className="w-full">{children}</main>
       </div>
       <Player />
     </div>

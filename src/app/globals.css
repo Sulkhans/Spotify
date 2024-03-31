@@ -11,6 +11,9 @@ button,
 input {
   outline: none;
 }
+.hide-scrollbar {
+  scrollbar-width: none;
+}
 
 .load {
   display: flex;

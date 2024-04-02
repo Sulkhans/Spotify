@@ -1,14 +1,111 @@
 "use client";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getToken } from "@/utils/cookie";
+import { PlaylistType, UserType } from "@/utils/types";
 import Link from "next/link";
 import Home from "@/assets/home.svg";
 import Search from "@/assets/search.svg";
-import { usePathname } from "next/navigation";
+import Library from "@/assets/library.svg";
+import Plus from "@/assets/plus.svg";
 
-export default function Sidebar() {
+type SidebarProps = {
+  user: UserType | null;
+};
+
+type AlbumType = {
+  id: string;
+  name: string;
+  image: string;
+  artist: string;
+};
+
+export default function Sidebar({ user }: SidebarProps) {
+  const [playlists, setPlaylists] = useState<Array<PlaylistType>>([]);
+  const [albums, setAlbums] = useState<Array<AlbumType>>([]);
+  const [full, setFull] = useState(true);
   const path = usePathname();
+  const token = getToken();
+
+  // move token and make new playlist work
+
+  const fetchPlaylists = () => {
+    fetch("https://api.spotify.com/v1/me/playlists?limit=20", {
+      method: "GET",
+      headers: { Authorization: "Bearer " + token },
+    })
+      .then((res) => res.json())
+      .then(({ items }) => {
+        console.log(items);
+
+        let list: PlaylistType[] = [];
+        items.forEach((item: any) =>
+          list.push({
+            id: item.id,
+            name: item.name,
+            image: item.images[0].url,
+            owner: item.owner.display_name,
+          })
+        );
+        setPlaylists(list);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  useEffect(() => {
+    if (token && playlists.length === 0) {
+      fetchPlaylists();
+    }
+    if (token && albums.length === 0) {
+      fetch("https://api.spotify.com/v1/me/albums?limit=20", {
+        method: "GET",
+        headers: { Authorization: "Bearer " + token },
+      })
+        .then((res) => res.json())
+        .then(({ items }) => {
+          let list: AlbumType[] = [];
+          items.forEach((item: any) =>
+            list.push({
+              id: item.album.id,
+              name: item.album.name,
+              image: item.album.images[2].url,
+              artist: item.album.artists[0].name,
+            })
+          );
+          setAlbums(list);
+        })
+        .catch((err) => console.error(err));
+    }
+  }, [token]);
+
+  const createNewPlaylist = () => {
+    const body = {
+      name: "New Playlist",
+      description: "New playlist description",
+      public: true,
+    };
+    fetch(`https://api.spotify.com/v1/users/${user?.id}/playlists`, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    })
+      .then((res) => res.json())
+      .then((json) => {
+        fetchPlaylists();
+        console.log("Success:", json);
+      })
+      .catch((error) => console.error("Error:", error));
+  };
+
   return (
-    <aside className="flex flex-col gap-2 min-w-[280px]">
-      <nav className="flex flex-col justify-around px-3 py-2 min-h-28 bg-spotify-base rounded-lg text-spotify-subtle font-bold">
+    <aside
+      className={`flex flex-col gap-2 
+      ${full ? "min-w-[280px]" : "min-w-[72px]"}`}
+    >
+      <nav className="flex flex-col justify-around px-3 py-2 h-28 bg-spotify-base rounded-lg text-spotify-subtle font-bold">
         <Link
           href="/home"
           className={`flex gap-5 px-3 py-1 group hover:text-white transition-all duration-500 
@@ -18,7 +115,7 @@ export default function Sidebar() {
             className={`w-6 h-6 group-hover:fill-white transition-all duration-500
             ${path === "/home" ? "fill-white" : "fill-spotify-subtle"}`}
           />
-          Home
+          {full && <span>Home</span>}
         </Link>
         <Link
           href="/search"
@@ -29,12 +126,73 @@ export default function Sidebar() {
             className={`w-6 h-6 group-hover:fill-white transition-all duration-500
             ${path === "/search" ? "fill-white" : "fill-spotify-subtle"}`}
           />
-          Search
+          {full && <span>Search</span>}
         </Link>
       </nav>
-      <div className="flex flex-col h-full bg-spotify-base rounded-lg">
-        <div></div>
-        <div></div>
+      <div className="flex flex-col h-[calc(100%-120px)] bg-spotify-base rounded-lg">
+        <div className="flex items-center justify-between gap-2 min-h-14 px-4 py-2">
+          <button
+            onClick={() => setFull(!full)}
+            className="flex gap-2.5 px-2 py-1 font-bold text-spotify-subtle hover:text-white group transition-all duration-500"
+          >
+            <Library className="w-6 h-6 fill-spotify-subtle group-hover:fill-white transition-all duration-500" />
+            {full && <span>Your Library</span>}
+          </button>
+          {full && (
+            <button
+              onClick={createNewPlaylist}
+              className="p-2 rounded-full hover:bg-spotify-highlight group"
+            >
+              <Plus className="w-4 h-4 fill-spotify-subtle group-hover:fill-white" />
+            </button>
+          )}
+        </div>
+        <div
+          className={`overflow-y-auto hide-scrollbar ${full ? "p-2" : "p-1"}`}
+        >
+          {playlists || albums ? (
+            <>
+              {playlists.map((list) => (
+                <Link
+                  key={list.id}
+                  href={"/playlist/" + list.id}
+                  className={`flex gap-3 p-2 rounded hover:bg-spotify-highlight active:bg-black
+                  ${path === "/playlist/" + list.id && "bg-spotify-dark"}`}
+                >
+                  <img src={list.image} className="rounded w-12 h-12" />
+                  {full && (
+                    <div className="flex flex-col justify-center gap-0.5">
+                      <p className="text-[15px]">{list.name}</p>
+                      <p className="text-xs text-spotify-gray font-semibold">
+                        Playlist • {list.owner}
+                      </p>
+                    </div>
+                  )}
+                </Link>
+              ))}
+              {albums.map((album) => (
+                <Link
+                  key={album.id}
+                  href={"/album/" + album.id}
+                  className={`flex gap-3 p-2 rounded hover:bg-spotify-highlight active:bg-black
+                    ${path === "/album/" + album.id && "bg-spotify-dark"}`}
+                >
+                  <img src={album.image} className="rounded w-12 h-12" />
+                  {full && (
+                    <div className="flex flex-col justify-center gap-0.5">
+                      <p className="text-[15px]">{album.name}</p>
+                      <p className="text-xs text-spotify-gray font-semibold">
+                        Album • {album.artist}
+                      </p>
+                    </div>
+                  )}
+                </Link>
+              ))}
+            </>
+          ) : (
+            <div></div>
+          )}
+        </div>
       </div>
     </aside>
   );

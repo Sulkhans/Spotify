@@ -8,6 +8,7 @@ import Home from "@/assets/home.svg";
 import Search from "@/assets/search.svg";
 import Library from "@/assets/library.svg";
 import Plus from "@/assets/plus.svg";
+import Note from "@/assets/note.svg";
 
 type SidebarProps = {
   user: UserType | null;
@@ -27,8 +28,6 @@ export default function Sidebar({ user }: SidebarProps) {
   const path = usePathname();
   const token = getToken();
 
-  // move token and make new playlist work
-
   const fetchPlaylists = () => {
     fetch("https://api.spotify.com/v1/me/playlists?limit=20", {
       method: "GET",
@@ -36,14 +35,12 @@ export default function Sidebar({ user }: SidebarProps) {
     })
       .then((res) => res.json())
       .then(({ items }) => {
-        console.log(items);
-
         let list: PlaylistType[] = [];
         items.forEach((item: any) =>
           list.push({
             id: item.id,
             name: item.name,
-            image: item.images[0].url,
+            image: item.images ? item.images[0].url : null,
             owner: item.owner.display_name,
           })
         );
@@ -53,9 +50,7 @@ export default function Sidebar({ user }: SidebarProps) {
   };
 
   useEffect(() => {
-    if (token && playlists.length === 0) {
-      fetchPlaylists();
-    }
+    if (token && playlists.length === 0) fetchPlaylists();
     if (token && albums.length === 0) {
       fetch("https://api.spotify.com/v1/me/albums?limit=20", {
         method: "GET",
@@ -81,7 +76,7 @@ export default function Sidebar({ user }: SidebarProps) {
   const createNewPlaylist = () => {
     const body = {
       name: "New Playlist",
-      description: "New playlist description",
+      description: "",
       public: true,
     };
     fetch(`https://api.spotify.com/v1/users/${user?.id}/playlists`, {
@@ -92,12 +87,8 @@ export default function Sidebar({ user }: SidebarProps) {
       },
       body: JSON.stringify(body),
     })
-      .then((res) => res.json())
-      .then((json) => {
-        fetchPlaylists();
-        console.log("Success:", json);
-      })
-      .catch((error) => console.error("Error:", error));
+      .then(() => fetchPlaylists())
+      .catch((err) => console.error(err));
   };
 
   return (
@@ -157,9 +148,13 @@ export default function Sidebar({ user }: SidebarProps) {
                   key={list.id}
                   href={"/playlist/" + list.id}
                   className={`flex gap-3 p-2 rounded hover:bg-spotify-highlight active:bg-black
-                  ${path === "/playlist/" + list.id && "bg-spotify-dark"}`}
+                  ${path === "/playlist/" + list.id && "bg-[#232323]"}`}
                 >
-                  <img src={list.image} className="rounded w-12 h-12" />
+                  {list.image ? (
+                    <img src={list.image} className="rounded w-12 h-12" />
+                  ) : (
+                    <Note className="rounded w-12 h-12 p-3 fill-[#b0b0b0] bg-[#282828]" />
+                  )}
                   {full && (
                     <div className="flex flex-col justify-center gap-0.5">
                       <p className="text-[15px]">{list.name}</p>
@@ -175,7 +170,7 @@ export default function Sidebar({ user }: SidebarProps) {
                   key={album.id}
                   href={"/album/" + album.id}
                   className={`flex gap-3 p-2 rounded hover:bg-spotify-highlight active:bg-black
-                    ${path === "/album/" + album.id && "bg-spotify-dark"}`}
+                    ${path === "/album/" + album.id && "bg-[#232323]"}`}
                 >
                   <img src={album.image} className="rounded w-12 h-12" />
                   {full && (

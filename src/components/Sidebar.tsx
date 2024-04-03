@@ -1,6 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getToken } from "@/utils/cookie";
 import { PlaylistType, UserType } from "@/utils/types";
 import Link from "next/link";
@@ -22,11 +22,13 @@ type AlbumType = {
 };
 
 export default function Sidebar({ user }: SidebarProps) {
+  const token = getToken();
+  const path = usePathname();
   const [playlists, setPlaylists] = useState<Array<PlaylistType>>([]);
   const [albums, setAlbums] = useState<Array<AlbumType>>([]);
   const [full, setFull] = useState(true);
-  const path = usePathname();
-  const token = getToken();
+  const [search, setSearch] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const fetchPlaylists = () => {
     fetch("https://api.spotify.com/v1/me/playlists?limit=20", {
@@ -91,6 +93,13 @@ export default function Sidebar({ user }: SidebarProps) {
       .catch((err) => console.error(err));
   };
 
+  const filteredPlaylists = playlists.filter((playlist) =>
+    playlist.name.toLowerCase().includes(search.toLowerCase())
+  );
+  const filteredAlbums = albums.filter((album) =>
+    album.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <aside
       className={`flex flex-col gap-2 
@@ -121,7 +130,7 @@ export default function Sidebar({ user }: SidebarProps) {
         </Link>
       </nav>
       <div className="flex flex-col h-[calc(100%-120px)] bg-spotify-base rounded-lg">
-        <div className="flex items-center justify-between gap-2 min-h-14 px-4 py-2">
+        <div className="flex items-center justify-between gap-2 min-h-14 px-4">
           <button
             onClick={() => setFull(!full)}
             className="flex gap-2.5 px-2 py-1 font-bold text-spotify-subtle hover:text-white group transition-all duration-500"
@@ -139,11 +148,29 @@ export default function Sidebar({ user }: SidebarProps) {
           )}
         </div>
         <div
-          className={`overflow-y-auto hide-scrollbar ${full ? "p-2" : "p-1"}`}
+          className={`overflow-y-auto hide-scrollbar
+          ${full ? "p-2 pt-0" : "p-1"}`}
         >
+          {full && (
+            <button className="flex items-center w-fit ml-2 mb-2 focus-within:rounded focus-within:bg-[#2a2a2a] group">
+              <div
+                onClick={() => inputRef.current!.focus()}
+                className="w-8 h-8 rounded-full p-[7px] hover:bg-[#2a2a2a]"
+              >
+                <Search className="fill-spotify-subtle group-hover:fill-white" />
+              </div>
+              <input
+                ref={inputRef}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search in Your Library"
+                className="w-0 bg-transparent font-bold text-xs text-spotify-subtle placeholder:text-spotify-subtle group-focus-within:w-36 transition-all duration-300"
+              />
+            </button>
+          )}
           {playlists || albums ? (
             <>
-              {playlists.map((list) => (
+              {filteredPlaylists.map((list) => (
                 <Link
                   key={list.id}
                   href={"/playlist/" + list.id}
@@ -165,7 +192,7 @@ export default function Sidebar({ user }: SidebarProps) {
                   )}
                 </Link>
               ))}
-              {albums.map((album) => (
+              {filteredAlbums.map((album) => (
                 <Link
                   key={album.id}
                   href={"/album/" + album.id}

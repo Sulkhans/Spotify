@@ -2,16 +2,24 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { getToken } from "@/utils/cookie";
-import { PlaylistType, UserType } from "@/utils/types";
+import { UserType } from "@/utils/types";
 import Link from "next/link";
 import Home from "@/assets/home.svg";
 import Search from "@/assets/search.svg";
 import Library from "@/assets/library.svg";
 import Plus from "@/assets/plus.svg";
 import Note from "@/assets/note.svg";
+import List from "@/assets/list.svg";
 
 type SidebarProps = {
   user: UserType | null;
+};
+
+type PlaylistType = {
+  id: string;
+  name: string;
+  image: string;
+  owner: string;
 };
 
 type AlbumType = {
@@ -24,9 +32,14 @@ type AlbumType = {
 export default function Sidebar({ user }: SidebarProps) {
   const token = getToken();
   const path = usePathname();
+  const [data, setData] = useState<{
+    playlists: PlaylistType[];
+    albums: AlbumType[];
+  }>({ playlists: [], albums: [] });
   const [playlists, setPlaylists] = useState<Array<PlaylistType>>([]);
   const [albums, setAlbums] = useState<Array<AlbumType>>([]);
   const [full, setFull] = useState(true);
+  const [sortBy, setSortBy] = useState("Recents");
   const [search, setSearch] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -46,59 +59,89 @@ export default function Sidebar({ user }: SidebarProps) {
             owner: item.owner.display_name,
           })
         );
+        setData((prev) => ({ ...prev, playlists: list }));
         setPlaylists(list);
       })
       .catch((err) => console.error(err));
   };
 
-  useEffect(() => {
-    if (token && playlists.length === 0) fetchPlaylists();
-    if (token && albums.length === 0) {
-      fetch("https://api.spotify.com/v1/me/albums?limit=20", {
-        method: "GET",
-        headers: { Authorization: "Bearer " + token },
+  const fetchAlbums = () => {
+    fetch("https://api.spotify.com/v1/me/albums?limit=20", {
+      method: "GET",
+      headers: { Authorization: "Bearer " + token },
+    })
+      .then((res) => res.json())
+      .then(({ items }) => {
+        let list: AlbumType[] = [];
+        items.forEach((item: any) =>
+          list.push({
+            id: item.album.id,
+            name: item.album.name,
+            image: item.album.images[2].url,
+            artist: item.album.artists[0].name,
+          })
+        );
+        setData((prev) => ({ ...prev, albums: list }));
+        setAlbums(list);
       })
-        .then((res) => res.json())
-        .then(({ items }) => {
-          let list: AlbumType[] = [];
-          items.forEach((item: any) =>
-            list.push({
-              id: item.album.id,
-              name: item.album.name,
-              image: item.album.images[2].url,
-              artist: item.album.artists[0].name,
-            })
-          );
-          setAlbums(list);
-        })
-        .catch((err) => console.error(err));
+      .catch((err) => console.error(err));
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchPlaylists();
+      fetchAlbums();
     }
   }, [token]);
 
   const createNewPlaylist = () => {
-    const body = {
-      name: "New Playlist",
-      description: "",
-      public: true,
-    };
-    fetch(`https://api.spotify.com/v1/users/${user?.id}/playlists`, {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + token,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    })
-      .then(() => fetchPlaylists())
-      .catch((err) => console.error(err));
+    if (user) {
+      const body = {
+        name: "New Playlist",
+        description: "",
+        public: true,
+      };
+      fetch(`https://api.spotify.com/v1/users/${user?.id}/playlists`, {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      })
+        .then(() => fetchPlaylists())
+        .catch((err) => console.error(err));
+    }
   };
 
-  const filteredPlaylists = playlists.filter((playlist) =>
-    playlist.name.toLowerCase().includes(search.toLowerCase())
-  );
-  const filteredAlbums = albums.filter((album) =>
-    album.name.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    setPlaylists(
+      data.playlists.filter((playlist) =>
+        playlist.name.toLowerCase().includes(search.toLowerCase())
+      )
+    );
+    setAlbums(
+      data.albums.filter((album) =>
+        album.name.toLowerCase().includes(search.toLowerCase())
+      )
+    );
+  }, [search]);
+
+  useEffect(() => {
+    const { playlists, albums } = data;
+    if (sortBy === "Alphabetical") {
+      setPlaylists([...playlists].sort((a, b) => a.name.localeCompare(b.name)));
+      setAlbums([...albums].sort((a, b) => a.name.localeCompare(b.name)));
+    } else if (sortBy === "Creator") {
+      setPlaylists(
+        [...playlists].sort((a, b) => a.owner.localeCompare(b.owner))
+      );
+      setAlbums([...albums].sort((a, b) => a.artist.localeCompare(b.artist)));
+    } else {
+      setPlaylists(playlists);
+      setAlbums(albums);
+    }
+  }, [sortBy]);
 
   return (
     <aside
@@ -148,29 +191,63 @@ export default function Sidebar({ user }: SidebarProps) {
           )}
         </div>
         <div
-          className={`overflow-y-auto hide-scrollbar
+          className={`overflow-y-auto min-h-60 hide-scrollbar
           ${full ? "p-2 pt-0" : "p-1"}`}
         >
-          {full && (
-            <button className="flex items-center w-fit ml-2 mb-2 focus-within:rounded focus-within:bg-[#2a2a2a] group">
-              <div
-                onClick={() => inputRef.current!.focus()}
-                className="w-8 h-8 rounded-full p-[7px] hover:bg-[#2a2a2a]"
-              >
-                <Search className="fill-spotify-subtle group-hover:fill-white" />
+          {user && full && (
+            <div className="relative flex items-center justify-between mb-2 pl-2">
+              <button className="flex relative z-10 items-center w-fit focus-within:rounded focus-within:bg-[#2a2a2a] group">
+                <div
+                  onClick={() => inputRef.current!.focus()}
+                  className="w-8 h-8 rounded-full p-[7px] hover:bg-[#2a2a2a]"
+                >
+                  <Search className="fill-spotify-subtle group-hover:fill-white" />
+                </div>
+                <input
+                  ref={inputRef}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search in Your Library"
+                  className="w-0 bg-transparent font-bold text-xs text-spotify-subtle placeholder:text-spotify-subtle group-focus-within:w-[13.5rem] transition-all duration-300"
+                />
+              </button>
+              <div className="absolute right-4 group z-0">
+                <button className="flex items-center gap-1 h-8 hover:scale-105">
+                  <p className="text-sm text-spotify-subtle group-hover:text-white">
+                    {sortBy}
+                  </p>
+                  <List className="w-4 h-4 fill-spotify-subtle group-hover:fill-white" />
+                </button>
+                <div className="absolute right-0 hidden rounded w-40 p-1 text-sm bg-[#282828] group-focus-within:flex flex-col">
+                  <p className="text-xs text-spotify-subtle p-3">Sort by</p>
+                  <button
+                    onClick={() => setSortBy("Recents")}
+                    className={`p-3 rounded text-start hover:bg-[#3e3e3e]
+                    ${sortBy === "Recents" && "text-spotify-green"}`}
+                  >
+                    Recents
+                  </button>
+                  <button
+                    onClick={() => setSortBy("Alphabetical")}
+                    className={`p-3 rounded text-start hover:bg-[#3e3e3e]
+                    ${sortBy === "Alphabetical" && "text-spotify-green"}`}
+                  >
+                    Alphabetical
+                  </button>
+                  <button
+                    onClick={() => setSortBy("Creator")}
+                    className={`p-3 rounded text-start hover:bg-[#3e3e3e]
+                    ${sortBy === "Creator" && "text-spotify-green"}`}
+                  >
+                    Creator
+                  </button>
+                </div>
               </div>
-              <input
-                ref={inputRef}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search in Your Library"
-                className="w-0 bg-transparent font-bold text-xs text-spotify-subtle placeholder:text-spotify-subtle group-focus-within:w-36 transition-all duration-300"
-              />
-            </button>
+            </div>
           )}
-          {playlists || albums ? (
-            <>
-              {filteredPlaylists.map((list) => (
+          <>
+            {playlists.length > 0 &&
+              playlists.map((list) => (
                 <Link
                   key={list.id}
                   href={"/playlist/" + list.id}
@@ -192,7 +269,8 @@ export default function Sidebar({ user }: SidebarProps) {
                   )}
                 </Link>
               ))}
-              {filteredAlbums.map((album) => (
+            {albums.length > 0 &&
+              albums.map((album) => (
                 <Link
                   key={album.id}
                   href={"/album/" + album.id}
@@ -210,9 +288,20 @@ export default function Sidebar({ user }: SidebarProps) {
                   )}
                 </Link>
               ))}
-            </>
-          ) : (
-            <div></div>
+          </>
+          {!user && full && (
+            <div className="rounded-lg px-5 py-4 mt-2 bg-[#242424]">
+              <p className="font-bold">Create your first playlist</p>
+              <p className="text-sm py-2 mb-3.5">It's easy, we'll help you</p>
+              <div className="my-1.5">
+                <Link
+                  href={"/"}
+                  className="rounded-full px-4 py-2 bg-white text-sm text-black font-bold"
+                >
+                  Create playlist
+                </Link>
+              </div>
+            </div>
           )}
         </div>
       </div>

@@ -5,13 +5,6 @@ export type UserType = {
   image: string;
 };
 
-export type PlaylistType = {
-  id: string;
-  name: string;
-  image: string;
-  owner: string;
-};
-
 type ArtistsType = {
   id: string;
   name: string;

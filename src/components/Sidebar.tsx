@@ -1,7 +1,6 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { getToken } from "@/utils/cookie";
 import { UserType } from "@/utils/types";
 import Link from "next/link";
 import Home from "@/assets/home.svg";
@@ -12,6 +11,7 @@ import Note from "@/assets/note.svg";
 import List from "@/assets/list.svg";
 
 type SidebarProps = {
+  token: string | null;
   user: UserType | null;
 };
 
@@ -29,8 +29,7 @@ type AlbumType = {
   artist: string;
 };
 
-export default function Sidebar({ user }: SidebarProps) {
-  const token = getToken();
+export default function Sidebar({ token, user }: SidebarProps) {
   const path = usePathname();
   const [data, setData] = useState<{
     playlists: PlaylistType[];
@@ -196,7 +195,7 @@ export default function Sidebar({ user }: SidebarProps) {
         >
           {user && full && (
             <div className="relative flex items-center justify-between mb-2 pl-2">
-              <button className="flex relative z-10 items-center w-fit focus-within:rounded focus-within:bg-[#2a2a2a] group">
+              <button className="flex relative z-10 items-center w-fit rounded-full focus-within:rounded focus-within:bg-[#2a2a2a] group">
                 <div
                   onClick={() => inputRef.current!.focus()}
                   className="w-8 h-8 rounded-full p-[7px] hover:bg-[#2a2a2a]"
@@ -218,7 +217,7 @@ export default function Sidebar({ user }: SidebarProps) {
                   </p>
                   <List className="w-4 h-4 fill-spotify-subtle group-hover:fill-white" />
                 </button>
-                <div className="absolute right-0 hidden rounded w-40 p-1 text-sm bg-[#282828] group-focus-within:flex flex-col">
+                <div className="absolute top-9 -right-3 hidden rounded w-40 p-1 text-sm bg-[#282828] group-focus-within:flex flex-col">
                   <p className="text-xs text-spotify-subtle p-3">Sort by</p>
                   <button
                     onClick={() => setSortBy("Recents")}
@@ -275,7 +274,7 @@ export default function Sidebar({ user }: SidebarProps) {
                   key={album.id}
                   href={"/album/" + album.id}
                   className={`flex gap-3 p-2 rounded hover:bg-spotify-highlight active:bg-black
-                    ${path === "/album/" + album.id && "bg-[#232323]"}`}
+                  ${path === "/album/" + album.id && "bg-[#232323]"}`}
                 >
                   <img src={album.image} className="rounded w-12 h-12" />
                   {full && (

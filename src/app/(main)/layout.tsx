@@ -35,7 +35,7 @@ export default function MainLayout({
     <div className="w-screen h-[100dvh] p-2 flex flex-col gap-2 bg-black">
       <div className="flex gap-2 h-[calc(100%-80px)]">
         <Sidebar token={token} user={user} />
-        <div className="w-full rounded-lg bg-spotify-base">
+        <div className="w-full h-full rounded-lg relative bg-spotify-base">
           <header className="flex justify-between py-4 px-5">
             <div>
               <button
@@ -92,7 +92,9 @@ export default function MainLayout({
               </div>
             )}
           </header>
-          <main>{children}</main>
+          <main className="max-h-[calc(100%-64px)] px-5 py-2 overflow-y-auto hide-scrollbar">
+            {children}
+          </main>
         </div>
       </div>
       <Player token={token} />

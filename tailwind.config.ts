@@ -12,12 +12,9 @@ const config: Config = {
         spotify: {
           base: "#121212",
           highlight: "#1a1a1a",
-          dark: "#0a0a0a",
-          subdued: "#727272",
           subtle: "#b3b3b3",
           gray: "#a7a7a7",
           green: "#1ed760",
-          press: "#169c46",
         },
       },
     },

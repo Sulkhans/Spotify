@@ -46,6 +46,11 @@ export default function Auth() {
     const clientID = "8152586828ad44c49d71071b08e811b2";
     const redirectURL = "http://localhost:3000";
     const scope = [
+      "playlist-modify-private",
+      "playlist-modify-public",
+      "playlist-read-private",
+      "user-library-modify",
+      "user-library-read",
       "user-read-email",
       "user-read-private",
       "user-modify-playback-state",
@@ -114,7 +119,7 @@ export default function Auth() {
             </a>
             <hr className="w-full md:w-2/3 my-8 border-[#292929]" />
             <p className="text-spotify-gray mb-1">Don't have an account?</p>
-            <a href="https://www.spotify.com/ge/signup" className="underline">
+            <a href="https://www.spotify.com/signup" className="underline">
               Sign up for Spotify
             </a>
           </>

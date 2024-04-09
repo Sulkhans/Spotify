@@ -64,7 +64,7 @@ export default function MainLayout({
                   >
                     Account
                   </a>
-                  <button
+                  <div
                     onClick={() => {
                       removeToken();
                       route.replace("/");
@@ -72,7 +72,7 @@ export default function MainLayout({
                     className="p-2.5 rounded text-start hover:bg-[#3e3e3e]"
                   >
                     Log out
-                  </button>
+                  </div>
                 </div>
               </button>
             ) : (

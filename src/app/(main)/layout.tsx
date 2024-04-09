@@ -32,7 +32,7 @@ export default function MainLayout({
   }, [token]);
 
   return (
-    <div className="w-screen h-[100dvh] p-2 flex flex-col gap-2 bg-black">
+    <div className="w-screen h-[100dvh] p-2 flex flex-col gap-2 bg-black overflow-x-auto">
       <div className="flex gap-2 h-[calc(100%-80px)]">
         <Sidebar token={token} user={user} />
         <div className="w-full h-full rounded-lg relative bg-spotify-base">

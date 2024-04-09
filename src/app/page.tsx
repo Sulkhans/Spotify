@@ -23,7 +23,10 @@ export default function Auth() {
           setUser({ id, name: display_name, email, image: images[1].url })
         )
         .catch((err) => {
-          removeToken();
+          if (token) {
+            removeToken();
+            router.refresh();
+          }
           console.error(err);
         });
     } else {

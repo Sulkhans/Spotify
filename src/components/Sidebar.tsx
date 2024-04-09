@@ -195,10 +195,10 @@ export default function Sidebar({ token, user }: SidebarProps) {
         >
           {user && full && (
             <div className="relative flex items-center justify-between mb-2 pl-2">
-              <button className="flex relative z-10 items-center w-fit rounded-full focus-within:rounded focus-within:bg-[#2a2a2a] group">
+              <button className="flex relative z-10 items-center w-fit rounded-full focus-within:rounded focus-within:bg-spotify-elevated-highlight group">
                 <div
                   onClick={() => inputRef.current!.focus()}
-                  className="w-8 h-8 rounded-full p-[7px] hover:bg-[#2a2a2a]"
+                  className="w-8 h-8 rounded-full p-[7px] hover:bg-spotify-elevated-highlight"
                 >
                   <Search className="fill-spotify-subtle group-hover:fill-white" />
                 </div>

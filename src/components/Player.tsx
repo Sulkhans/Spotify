@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ArtistsType } from "@/utils/types";
 import Previous from "@/assets/previous.svg";
 import Next from "@/assets/next.svg";
 import Pause from "@/assets/pause.svg";
@@ -20,7 +21,7 @@ type PlaybackType = {
     name: string;
     image: string;
     duration: number;
-    artists: { id: string; name: string }[];
+    artists: ArtistsType[];
     album_id: string;
   };
 };

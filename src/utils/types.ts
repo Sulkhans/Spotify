@@ -5,7 +5,7 @@ export type UserType = {
   image: string;
 };
 
-type ArtistsType = {
+export type ArtistsType = {
   id: string;
   name: string;
 };

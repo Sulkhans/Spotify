@@ -260,7 +260,7 @@ export default function Sidebar({ token, user }: SidebarProps) {
                   )}
                   {full && (
                     <div className="flex flex-col justify-center gap-0.5">
-                      <p className="text-[15px]">{list.name}</p>
+                      <p className="text-[15px] line-clamp-1">{list.name}</p>
                       <p className="text-xs text-spotify-gray font-semibold">
                         Playlist • {list.owner}
                       </p>
@@ -279,7 +279,7 @@ export default function Sidebar({ token, user }: SidebarProps) {
                   <img src={album.image} className="rounded w-12 h-12" />
                   {full && (
                     <div className="flex flex-col justify-center gap-0.5">
-                      <p className="text-[15px]">{album.name}</p>
+                      <p className="text-[15px] line-clamp-1">{album.name}</p>
                       <p className="text-xs text-spotify-gray font-semibold">
                         Album • {album.artist}
                       </p>

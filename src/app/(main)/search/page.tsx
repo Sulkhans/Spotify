@@ -6,6 +6,8 @@ import { getToken } from "@/utils/cookie";
 import { ArtistsType } from "@/utils/types";
 import SearchSVG from "@/assets/search.svg";
 import Play from "@/assets/play.svg";
+import Artist from "@/assets/artist.svg";
+import Loading from "@/components/Loading";
 
 type AlbumType = {
   id: string;
@@ -53,6 +55,7 @@ export default function Search() {
   useEffect(() => {
     if (token && search.replaceAll(" ", "").length > 0) {
       setLoading(true);
+      setResults(null);
       fetch(
         `https://api.spotify.com/v1/search?q=${search}&type=album%2Ctrack%2Cplaylist%2Cartist&limit=5`,
         {
@@ -85,7 +88,7 @@ export default function Search() {
           const artistsRes = artists.items.map((artist: any) => ({
             id: artist.id,
             name: artist.name,
-            image: artist.images[1].url,
+            image: artist.images.length > 1 ? artist.images[1].url : null,
           }));
           setResults({
             albums: albumsRes,
@@ -119,6 +122,7 @@ export default function Search() {
           className="ml-2 bg-transparent w-full text-sm text-white placeholder:text-neutral-500"
         />
       </div>
+      {loading && <Loading />}
       {results?.tracks && results.tracks.length > 0 && (
         <section>
           <h1 className="mb-2 text-2xl font-bold text-white tracking-tighter">
@@ -136,10 +140,10 @@ export default function Search() {
                     <Play className="size-10 p-2.5 fill-white absolute top-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100" />
                   </div>
                   <div className="flex flex-col justify-center gap-0.5">
-                    <p className="leading-none tracking-tight line-clamp-1">
+                    <p className="leading-5 tracking-tight line-clamp-1">
                       {track.name}
                     </p>
-                    <span className="text-sm text-spotify-gray font-medium line-clamp-1">
+                    <span className="text-sm leading-4 text-spotify-gray font-medium line-clamp-1">
                       {track.artists.map((artist, i) => (
                         <span key={artist.id}>
                           {i > 0 && <span className="mr-1">,</span>}
@@ -172,12 +176,18 @@ export default function Search() {
               <div
                 key={artist.id}
                 onClick={() => router.push("/artist/" + artist.id)}
-                className="p-3 hover:bg-spotify-highlight rounded-md max-w-52 cursor-pointer"
+                className="flex-1 p-3 hover:bg-spotify-highlight rounded-md max-w-52 cursor-pointer"
               >
-                <img
-                  src={artist.image}
-                  className="rounded-full min-w-20 aspect-square object-cover"
-                />
+                {artist.image ? (
+                  <img
+                    src={artist.image}
+                    className="rounded-full min-w-20 aspect-square object-cover"
+                  />
+                ) : (
+                  <div className="flex justify-center items-center rounded-full aspect-square bg-[#333333]">
+                    <Artist className="fill-white size-8 md:size-12 lg:size-16" />
+                  </div>
+                )}
                 <p className="line-clamp-1 tracking-tight mt-2">
                   {artist.name}
                 </p>
@@ -245,8 +255,8 @@ export default function Search() {
           </div>
         </section>
       )}
-      {results &&
-        results.albums.length === 0 &&
+      {!loading &&
+        results?.albums.length === 0 &&
         results.playlists.length === 0 &&
         results.tracks.length === 0 && (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center">

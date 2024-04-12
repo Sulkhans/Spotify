@@ -35,7 +35,8 @@ export default function Album({ params }: { params: { id: string } }) {
             tracks: tracklist,
           });
         }
-      );
+      )
+      .catch((err) => console.error(err));
   }, []);
 
   const totalDuration = useMemo(() => {
@@ -74,6 +75,7 @@ export default function Album({ params }: { params: { id: string } }) {
           <div className="text-sm mt-2">
             {album.artists.map((artist) => (
               <Link
+                key={artist.id}
                 href={"/artist/" + artist.id}
                 className="font-bold hover:underline"
               >
@@ -102,7 +104,9 @@ export default function Album({ params }: { params: { id: string } }) {
             key={track.id}
             className="grid grid-cols-[16px_minmax(200px,1fr)_40px] gap-4 h-14 items-center rounded pl-4 pr-12 text-spotify-gray hover:bg-white hover:bg-opacity-10"
           >
-            <p className="place-self-center">{track.track_number}</p>
+            <p className="place-self-center font-medium">
+              {track.track_number}
+            </p>
             <div>
               <p className="leading-[22px] text-white line-clamp-1">
                 {track.name}

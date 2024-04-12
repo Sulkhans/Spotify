@@ -25,3 +25,21 @@ export type AlbumType = {
     track_number: number;
   }>;
 };
+
+export type PlaylistType = {
+  id: string;
+  name: string;
+  owner: string;
+  image: string;
+  followers: number;
+  tracks: Array<{
+    id: string;
+    name: string;
+    image: string;
+    artists: Array<ArtistsType>;
+    album: { id: string; name: string };
+    duration: number;
+    added_at: string;
+  }>;
+  total_tracks: number;
+};

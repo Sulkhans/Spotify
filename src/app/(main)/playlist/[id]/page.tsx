@@ -5,38 +5,41 @@ import { PlaylistType } from "@/utils/types";
 import { getToken } from "@/utils/cookie";
 import Loading from "@/components/Loading";
 import Time from "@/assets/time.svg";
+import Note from "@/assets/note.svg";
 
 export default function Playlist({ params }: { params: { id: string } }) {
   const [playlist, setPlaylist] = useState<PlaylistType | null>(null);
   const token = getToken();
 
   useEffect(() => {
-    fetch(`https://api.spotify.com/v1/playlists/${params.id}`, {
-      method: "GET",
-      headers: { Authorization: "Bearer " + token },
-    })
-      .then((res) => res.json())
-      .then(({ id, name, images, owner, followers, tracks }) => {
-        const tracklist = tracks.items.map((item: any) => ({
-          id: item.id,
-          name: item.track.name,
-          image: item.track.album.images[2].url,
-          artists: item.track.artists,
-          album: { id: item.track.album.id, name: item.track.album.name },
-          duration: item.track.duration_ms,
-          added_at: item.added_at,
-        }));
-        setPlaylist({
-          id,
-          name,
-          image: images[0].url,
-          owner: owner.display_name,
-          followers: followers.total,
-          total_tracks: tracks.total,
-          tracks: tracklist,
-        });
+    if (!playlist) {
+      fetch(`https://api.spotify.com/v1/playlists/${params.id}`, {
+        method: "GET",
+        headers: { Authorization: "Bearer " + token },
       })
-      .catch((err) => console.error(err));
+        .then((res) => res.json())
+        .then(({ id, name, images, owner, followers, tracks }) => {
+          const tracklist = tracks.items.map((item: any) => ({
+            id: item.id,
+            name: item.track.name,
+            image: item.track.album.images[2].url,
+            artists: item.track.artists,
+            album: { id: item.track.album.id, name: item.track.album.name },
+            duration: item.track.duration_ms,
+            added_at: item.added_at,
+          }));
+          setPlaylist({
+            id,
+            name,
+            image: images ? images[0].url : null,
+            owner: owner.display_name,
+            followers: followers.total,
+            total_tracks: tracks.total,
+            tracks: tracklist,
+          });
+        })
+        .catch((err) => console.error(err));
+    }
   }, []);
 
   const totalDuration = useMemo(() => {
@@ -75,10 +78,14 @@ export default function Playlist({ params }: { params: { id: string } }) {
   return playlist ? (
     <div>
       <div className="flex flex-col items-center mb-5 sm:flex-row sm:items-end lg:mt-4">
-        <img
-          src={playlist.image}
-          className="rounded mb-4 sm:mr-6 sm:mb-0 size-40 md:size-44 lg:size-56"
-        />
+        {playlist.image ? (
+          <img
+            src={playlist.image}
+            className="rounded mb-4 sm:mr-6 sm:mb-0 size-40 md:size-44 lg:size-56"
+          />
+        ) : (
+          <Note className="rounded mb-4 sm:mr-6 sm:mb-0 size-40 md:size-44 lg:size-56 p-12 lg:p-20 fill-[#7f7f7f] bg-[#282828]" />
+        )}
         <div>
           <p className="text-sm">Playlist</p>
           <p className="py-2 text-3xl md:text-5xl lg:text-7xl font-black tracking-tight text-balance">

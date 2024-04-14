@@ -43,3 +43,22 @@ export type PlaylistType = {
   }>;
   total_tracks: number;
 };
+
+export type ArtistType = {
+  name: string;
+  image: string;
+  albums: {
+    id: string;
+    name: string;
+    image: string;
+    artists: Array<ArtistsType>;
+    release_date: string;
+  }[];
+  topTracks: {
+    id: string;
+    name: string;
+    duration: number;
+    artists: Array<ArtistsType>;
+    image: string;
+  }[];
+};

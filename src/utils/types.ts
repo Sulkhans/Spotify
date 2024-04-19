@@ -62,3 +62,12 @@ export type ArtistType = {
     image: string;
   }[];
 };
+
+export type TracksType = {
+  id: string;
+  name: string;
+  duration: number;
+  artists: Array<ArtistsType>;
+  album: { id: string; name: string };
+  image: string;
+};

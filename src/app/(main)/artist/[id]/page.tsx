@@ -74,7 +74,7 @@ export default function Album({ params }: { params: { id: string } }) {
 
   return artist ? (
     <div>
-      <div className="flex flex-col items-center mb-5 sm:flex-row sm:items-end lg:mt-4">
+      <div className="flex flex-col items-center p-6 pt-20 mb-5 sm:flex-row sm:items-end bg-neutral-900">
         <img
           src={artist.image}
           className="rounded-full aspect-square mb-4 sm:mr-6 sm:mb-0 size-40 md:size-44 lg:size-56"
@@ -84,13 +84,13 @@ export default function Album({ params }: { params: { id: string } }) {
         </p>
       </div>
       <section>
-        <h1 className="mb-4 text-2xl font-bold text-white tracking-tighter">
+        <h1 className="mb-4 px-6 text-2xl font-bold text-white tracking-tighter">
           Popular
         </h1>
         {artist.topTracks.slice(0, trackCount).map((track, i) => (
           <div
             key={track.id}
-            className="grid grid-cols-[16px_40px_minmax(200px,1fr)_40px] gap-4 h-14 items-center rounded pl-4 pr-12 text-spotify-gray hover:bg-white hover:bg-opacity-10"
+            className="grid grid-cols-[16px_40px_minmax(200px,1fr)_40px] gap-4 h-14 items-center rounded pl-4 pr-12 mx-3 text-spotify-gray hover:bg-white hover:bg-opacity-10"
           >
             <p className="place-self-center font-medium">{i + 1}</p>
             <img src={track.image} className="rounded" />
@@ -118,15 +118,15 @@ export default function Album({ params }: { params: { id: string } }) {
       </section>
       <button
         onClick={() => setTrackCount(trackCount === 5 ? 10 : 5)}
-        className="mb-6 p-4 text-sm text-spotify-gray font-bold hover:text-white"
+        className="mb-6 ml-3 p-4 text-sm text-spotify-gray font-bold hover:text-white"
       >
         {trackCount === 5 ? "See more" : "Show less"}
       </button>
       <section>
-        <h1 className="mb-4 text-2xl font-bold text-white tracking-tighter">
+        <h1 className="mb-2 ml-6 text-2xl font-bold text-white tracking-tighter">
           Albums
         </h1>
-        <div className="overflow-x-auto hide-scrollbar mb-4">
+        <div className="overflow-x-auto hide-scrollbar mb-4 mx-3">
           <div className="flex w-0">
             {artist.albums.map((album) => (
               <div

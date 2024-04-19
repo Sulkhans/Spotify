@@ -4,7 +4,7 @@ import { getToken, removeToken } from "@/utils/cookie";
 import Player from "@/components/Player";
 import Sidebar from "@/components/Sidebar";
 import { UserType } from "@/utils/types";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Arrow from "@/assets/arrow.svg";
 import Link from "next/link";
 
@@ -16,6 +16,8 @@ export default function MainLayout({
   const route = useRouter();
   const token = getToken();
   const [user, setUser] = useState<UserType | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (token) {
@@ -31,12 +33,38 @@ export default function MainLayout({
     }
   }, [token]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const element = ref.current;
+      if (element) {
+        if (element.scrollTop > 70) {
+          setIsScrolled(true);
+        } else {
+          setIsScrolled(false);
+        }
+      }
+    };
+
+    const element = ref.current;
+    if (element) {
+      element.addEventListener("scroll", handleScroll);
+    }
+
+    // Clean up the event listener
+    return () => {
+      element?.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <div className="w-screen h-[100dvh] p-2 flex flex-col gap-2 bg-black overflow-x-auto">
       <div className="flex gap-2 h-[calc(100%-80px)]">
         <Sidebar token={token} user={user} />
-        <div className="w-full h-full rounded-lg relative bg-spotify-base">
-          <header className="flex justify-between py-4 px-5">
+        <div className="w-full h-full rounded-lg relative bg-spotify-base overflow-hidden">
+          <header
+            className={`absolute w-full flex justify-between py-4 px-6 z-50 transition-all duration-300
+            ${isScrolled && "bg-spotify-base"}`}
+          >
             <div>
               <button
                 onClick={() => route.back()}
@@ -92,7 +120,7 @@ export default function MainLayout({
               </div>
             )}
           </header>
-          <main className="max-h-[calc(100%-64px)] px-5 py-2 overflow-y-auto hide-scrollbar">
+          <main ref={ref} className="max-h-full overflow-y-auto hide-scrollbar">
             {children}
           </main>
         </div>

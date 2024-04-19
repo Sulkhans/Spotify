@@ -9,8 +9,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [tracklist, setTracklist] = useState<Array<TracksType> | null>(null);
   const router = useRouter();
-
   const token = getToken();
+
   useEffect(() => {
     fetch(
       "https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=30",
@@ -45,12 +45,13 @@ export default function Home() {
   return loading ? (
     <Loading />
   ) : (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 pt-16">
       {filteredAlbums && (
         <>
-          <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 my-3 text-xs sm:text-sm font-semibold text-balance cursor-pointer">
+          <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-3 mb-6 px-6 text-xs sm:text-sm font-semibold text-balance cursor-pointer">
             {filteredAlbums.slice(0, 8).map((track) => (
               <div
+                key={track.album.id}
                 onClick={() => router.push("/album/" + track.album.id)}
                 className="rounded overflow-hidden bg-[#ffffff12] hover:bg-[#ffffff33] flex gap-3 items-center transition-all"
               >
@@ -60,10 +61,10 @@ export default function Home() {
             ))}
           </section>
           <section>
-            <h1 className="mb-2 text-2xl font-bold text-white tracking-tighter">
+            <h1 className="mb-2 px-6 text-2xl font-bold text-white tracking-tighter">
               Recommended for today
             </h1>
-            <div className="overflow-x-auto hide-scrollbar mb-4">
+            <div className="overflow-x-auto hide-scrollbar mb-4 px-3">
               <div className="flex w-0">
                 {filteredAlbums
                   .slice(8, (filteredAlbums.length + 8) / 2)
@@ -89,10 +90,10 @@ export default function Home() {
             </div>
           </section>
           <section>
-            <h1 className="mb-2 text-2xl font-bold text-white tracking-tighter">
+            <h1 className="mb-2 px-6 text-2xl font-bold text-white tracking-tighter">
               Jump back in
             </h1>
-            <div className="overflow-x-auto hide-scrollbar mb-4">
+            <div className="overflow-x-auto hide-scrollbar mb-4 px-3">
               <div className="flex w-0">
                 {filteredAlbums
                   .slice((filteredAlbums.length + 8) / 2, filteredAlbums.length)

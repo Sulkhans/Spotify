@@ -111,8 +111,8 @@ export default function Search() {
   };
 
   return (
-    <div>
-      <div className="flex items-center max-w-96 p-3.5 mb-4 bg-[#242424] hover:bg-[#2a2a2a] rounded-full group focus-within:ring-2 ring-white">
+    <div className="pt-16">
+      <div className="flex items-center max-w-96 p-3.5 ml-6 mb-4 bg-[#242424] hover:bg-[#2a2a2a] rounded-full group focus-within:ring-2 ring-white">
         <SearchSVG className="w-5 h-5 fill-spotify-subtle group-hover:fill-white group-focus-within:fill-white" />
         <input
           autoFocus
@@ -124,7 +124,7 @@ export default function Search() {
       </div>
       {loading && <Loading />}
       {results?.tracks && results.tracks.length > 0 && (
-        <section>
+        <section className="px-6">
           <h1 className="mb-2 text-2xl font-bold text-white tracking-tighter">
             Songs
           </h1>
@@ -168,10 +168,10 @@ export default function Search() {
       )}
       {results?.artists && results.artists.length > 0 && (
         <section className="mt-8">
-          <h1 className="mb-2 text-2xl font-bold text-white tracking-tighter">
+          <h1 className="mb-2 px-6 text-2xl font-bold text-white tracking-tighter">
             Artists
           </h1>
-          <div className="flex">
+          <div className="flex px-3">
             {results.artists.map((artist) => (
               <div
                 key={artist.id}
@@ -199,10 +199,10 @@ export default function Search() {
       )}
       {results?.albums && results.albums.length > 0 && (
         <section className="mt-8">
-          <h1 className="mb-2 text-2xl font-bold text-white tracking-tighter">
+          <h1 className="mb-2 px-6 text-2xl font-bold text-white tracking-tighter">
             Albums
           </h1>
-          <div className="flex">
+          <div className="flex px-3">
             {results.albums.map((album) => (
               <div
                 key={album.id}
@@ -232,10 +232,10 @@ export default function Search() {
       )}
       {results?.playlists && results.playlists.length > 0 && (
         <section className="mt-8">
-          <h1 className="mb-2 text-2xl font-bold text-white tracking-tighter">
+          <h1 className="mb-2 px-6 text-2xl font-bold text-white tracking-tighter">
             Playlists
           </h1>
-          <div className="flex">
+          <div className="flex px-3">
             {results.playlists.map((list) => (
               <div
                 key={list.id}

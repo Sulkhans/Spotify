@@ -62,6 +62,7 @@ export default function Auth() {
       "user-read-recently-played",
       "user-read-playback-position",
       "user-top-read",
+      "streaming",
     ];
     window.location.href = `${url}?client_id=${clientID}&redirect_uri=${redirectURL}&scope=${scope.join(
       " "

@@ -73,7 +73,9 @@ export default function Player({ token }: PlayerProps) {
   return (
     <footer className="min-h-[72px] flex justify-between items-center">
       <div className="flex grow items-center">
-        <img src={playback?.track.image} className="w-14 h-14 rounded mx-2" />
+        {playback?.track.image && (
+          <img src={playback?.track.image} className="w-14 h-14 rounded mx-2" />
+        )}
         <div className="ml-2 font-medium">
           <Link
             href={"/album/" + playback?.track.album_id}

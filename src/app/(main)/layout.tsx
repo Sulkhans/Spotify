@@ -34,8 +34,8 @@ export default function MainLayout({
   }, [token]);
 
   useEffect(() => {
+    const element = ref.current;
     const handleScroll = () => {
-      const element = ref.current;
       if (element) {
         if (element.scrollTop > 70) {
           setIsScrolled(true);
@@ -44,13 +44,9 @@ export default function MainLayout({
         }
       }
     };
-
-    const element = ref.current;
     if (element) {
       element.addEventListener("scroll", handleScroll);
     }
-
-    // Clean up the event listener
     return () => {
       element?.removeEventListener("scroll", handleScroll);
     };

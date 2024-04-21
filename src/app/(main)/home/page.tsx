@@ -3,11 +3,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { TracksType } from "@/utils/types";
 import { getToken } from "@/utils/cookie";
+import { FastAverageColor } from "fast-average-color";
 import Loading from "@/components/Loading";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [tracklist, setTracklist] = useState<Array<TracksType> | null>(null);
+  const [color, setColor] = useState<any>({ hex: "#535353" });
   const router = useRouter();
   const token = getToken();
 
@@ -42,16 +44,33 @@ export default function Home() {
     return isUnique;
   });
 
+  const getColor = (url: string) => {
+    const fac = new FastAverageColor();
+    fac.getColorAsync(url).then((color) => setColor(color));
+  };
+
   return loading ? (
     <Loading />
   ) : (
-    <div className="flex flex-col gap-4 pt-16">
+    <div className="flex flex-col gap-4">
       {filteredAlbums && (
-        <>
-          <section className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-3 mb-6 px-6 text-xs sm:text-sm font-semibold text-balance cursor-pointer">
+        <div className="relative">
+          <div
+            className="absolute top-0 w-full h-80 transition-all duration-1000"
+            style={{ backgroundColor: color.hex }}
+          >
+            <div
+              className="size-full"
+              style={{
+                background: "linear-gradient(rgba(0,0,0,.6), #121212)",
+              }}
+            />
+          </div>
+          <section className="relative grid grid-cols-2 lg:grid-cols-4 gap-3 mt-20 mb-10 px-6 text-xs sm:text-sm font-semibold text-balance cursor-pointer">
             {filteredAlbums.slice(0, 8).map((track) => (
               <div
                 key={track.album.id}
+                onMouseEnter={(url) => getColor(track.image)}
                 onClick={() => router.push("/album/" + track.album.id)}
                 className="rounded overflow-hidden bg-[#ffffff12] hover:bg-[#ffffff33] flex gap-3 items-center transition-all"
               >
@@ -60,7 +79,7 @@ export default function Home() {
               </div>
             ))}
           </section>
-          <section>
+          <section className="relative">
             <h1 className="mb-2 px-6 text-2xl font-bold text-white tracking-tighter">
               Recommended for today
             </h1>
@@ -118,7 +137,7 @@ export default function Home() {
               </div>
             </div>
           </section>
-        </>
+        </div>
       )}
     </div>
   );

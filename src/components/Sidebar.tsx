@@ -5,6 +5,7 @@ import { UserType } from "@/utils/types";
 import Link from "next/link";
 import Home from "@/assets/home.svg";
 import Search from "@/assets/search.svg";
+import LibraryFull from "@/assets/libraryFilled.svg";
 import Library from "@/assets/library.svg";
 import Plus from "@/assets/plus.svg";
 import Note from "@/assets/note.svg";
@@ -139,7 +140,7 @@ export default function Sidebar({ token, user }: SidebarProps) {
 
   return (
     <aside
-      className={`flex flex-col gap-2 
+      className={`flex flex-col gap-2
       ${full ? "min-w-[280px]" : "min-w-[72px]"}`}
     >
       <nav className="flex flex-col justify-around px-3 py-2 h-28 bg-spotify-base rounded-lg text-spotify-subtle font-bold">
@@ -167,12 +168,19 @@ export default function Sidebar({ token, user }: SidebarProps) {
         </Link>
       </nav>
       <div className="flex flex-col h-[calc(100%-120px)] bg-spotify-base rounded-lg">
-        <div className="flex items-center justify-between gap-2 min-h-14 px-4">
+        <div
+          className={`flex items-center justify-between gap-2 px-4 
+          ${full ? "min-h-14" : "min-h-10 mt-2 mb-0.5"}`}
+        >
           <button
             onClick={() => setFull(!full)}
             className="flex gap-2.5 px-2 py-1 font-bold text-spotify-subtle hover:text-white group transition-all duration-500"
           >
-            <Library className="w-6 h-6 fill-spotify-subtle group-hover:fill-white transition-all duration-500" />
+            {full ? (
+              <LibraryFull className="w-6 h-6 fill-spotify-subtle group-hover:fill-white transition-all duration-500" />
+            ) : (
+              <Library className="w-6 h-6 fill-spotify-subtle group-hover:fill-white transition-all duration-500" />
+            )}
             {full && <span>Your Library</span>}
           </button>
           {full && (
@@ -185,7 +193,7 @@ export default function Sidebar({ token, user }: SidebarProps) {
           )}
         </div>
         <div
-          className={`overflow-y-auto min-h-60 hide-scrollbar
+          className={`overflow-y-auto min-h-60 hide-scrollbar rounded-xl
           ${full ? "p-2 pt-0" : "p-1"}`}
         >
           {user && full && (

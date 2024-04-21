@@ -67,66 +67,90 @@ export default function Player({ token }: PlayerProps) {
         .padStart(2, "0");
       return min + ":" + sec;
     }
-    return "0:00";
+    return "-:--";
   };
 
   return (
     <footer className="min-h-[72px] flex justify-between items-center">
-      <div className="flex grow items-center">
-        {playback?.track.image && (
-          <img src={playback?.track.image} className="w-14 h-14 rounded mx-2" />
+      <div className="flex items-center min-w-44 w-[30%]">
+        {playback?.track && (
+          <>
+            <img
+              src={playback?.track.image}
+              className="w-14 h-14 rounded mx-2"
+            />
+            <div className="ml-2 font-medium">
+              <Link
+                href={"/album/" + playback?.track.album_id}
+                className="text-sm hover:underline"
+              >
+                {playback?.track.name}
+              </Link>
+              <div className="flex text-xs text-spotify-gray">
+                {playback?.track.artists.map((artist, i) => (
+                  <p key={artist.id}>
+                    {i > 0 && <span className="mr-1">,</span>}
+                    <Link
+                      href={"/artist/" + artist.id}
+                      className="hover:underline hover:text-white"
+                    >
+                      {artist.name}
+                    </Link>
+                  </p>
+                ))}
+              </div>
+            </div>
+          </>
         )}
-        <div className="ml-2 font-medium">
-          <Link
-            href={"/album/" + playback?.track.album_id}
-            className="text-sm hover:underline"
-          >
-            {playback?.track.name}
-          </Link>
-          <div className="flex text-xs text-spotify-gray">
-            {playback?.track.artists.map((artist, i) => (
-              <p key={artist.id}>
-                {i > 0 && <span className="mr-1">,</span>}
-                <Link
-                  href={"/artist/" + artist.id}
-                  className="hover:underline hover:text-white"
-                >
-                  {artist.name}
-                </Link>
-              </p>
-            ))}
-          </div>
-        </div>
       </div>
-      <div className="flex flex-col grow">
+      <div className="flex flex-col w-[40%]">
         <div className="flex mb-2 m-auto">
           <button className="size-8 p-2 group">
-            <Shuffle className="fill-spotify-subtle group-hover:fill-white" />
+            <Shuffle
+              className={`fill-spotify-subtle 
+              ${playback?.track ? "group-hover:fill-white" : "opacity-35"}`}
+            />
           </button>
           <button className="size-8 p-2 ml-2 group">
-            <Previous className="fill-spotify-subtle group-hover:fill-white" />
+            <Previous
+              className={`fill-spotify-subtle 
+              ${playback?.track ? "group-hover:fill-white" : "opacity-35"}`}
+            />
           </button>
-          <button className="size-8 p-2 mx-4 bg-white rounded-full hover:scale-105">
+          <button
+            className={`size-8 p-2 mx-4 bg-white rounded-full hover:scale-105
+            ${!playback?.track && "opacity-35"}`}
+          >
             {playback?.is_playing ? <Pause /> : <Play />}
           </button>
           <button className="size-8 p-2 mr-2 group">
-            <Next className="fill-spotify-subtle group-hover:fill-white" />
+            <Next
+              className={`fill-spotify-subtle 
+              ${playback?.track ? "group-hover:fill-white" : "opacity-35"}`}
+            />
           </button>
           <button className="size-8 p-2 group">
-            <Repeat className="fill-spotify-subtle group-hover:fill-white" />
+            <Repeat
+              className={`fill-spotify-subtle 
+              ${playback?.track ? "group-hover:fill-white" : "opacity-35"}`}
+            />
           </button>
         </div>
-        <div className="flex items-center gap-2 text-xs font-medium text-spotify-subtle">
+        <div className="flex justify-center items-center gap-2 text-xs font-medium text-spotify-subtle">
           <span>{format(playback?.progress)}</span>
-          <div className="w-full h-1 rounded-full bg-[#4d4d4d] group">
-            <div className="h-full w-20 rounded-full bg-white group-hover:bg-spotify-green relative">
-              <div className="hidden group-hover:block size-3 rounded-full bg-white absolute -top-1 -right-1.5" />
+          <div className="w-[80%] h-1 rounded-full bg-[#4d4d4d] group">
+            <div className="h-full w-0 rounded-full bg-white group-hover:bg-spotify-green relative">
+              {playback?.track && (
+                <div className="hidden group-hover:block size-3 rounded-full bg-white absolute -top-1 -right-1.5" />
+              )}
             </div>
           </div>
-          <span>{format(playback?.track.duration)}</span>
+          <span className="text-nowrap whitespace-nowrap">
+            {format(playback?.track.duration)}
+          </span>
         </div>
       </div>
-      <div className="grow"></div>
+      <div className="w-[30%]"></div>
     </footer>
   );
 }

@@ -134,13 +134,13 @@ export default function Album({ params }: { params: { id: string } }) {
       </div>
       <div className="relative">
         <div
-          className="w-full h-60 absolute top-0 opacity-30"
+          className="w-full h-56 absolute top-0"
           style={{ backgroundColor: color ? color.hex : "" }}
         >
           <div
             className="size-full"
             style={{
-              background: "linear-gradient(transparent 10%, #121212)",
+              background: "linear-gradient(rgba(0,0,0,.6), #121212)",
             }}
           />
         </div>
@@ -160,7 +160,7 @@ export default function Album({ params }: { params: { id: string } }) {
           </div>
           <hr className="opacity-25 border-spotify-gray" />
         </div>
-        <div className="relative px-6">
+        <div className="relative px-6 pb-6">
           {album.tracks.map((track) => (
             <div
               key={track.id}

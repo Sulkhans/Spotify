@@ -131,11 +131,6 @@ export default function Sidebar({ token, user }: SidebarProps) {
     if (sortBy === "Alphabetical") {
       setPlaylists([...playlists].sort((a, b) => a.name.localeCompare(b.name)));
       setAlbums([...albums].sort((a, b) => a.name.localeCompare(b.name)));
-    } else if (sortBy === "Creator") {
-      setPlaylists(
-        [...playlists].sort((a, b) => a.owner.localeCompare(b.owner))
-      );
-      setAlbums([...albums].sort((a, b) => a.artist.localeCompare(b.artist)));
     } else {
       setPlaylists(playlists);
       setAlbums(albums);
@@ -232,13 +227,6 @@ export default function Sidebar({ token, user }: SidebarProps) {
                     ${sortBy === "Alphabetical" && "text-spotify-green"}`}
                   >
                     Alphabetical
-                  </button>
-                  <button
-                    onClick={() => setSortBy("Creator")}
-                    className={`p-3 rounded text-start hover:bg-[#3e3e3e]
-                    ${sortBy === "Creator" && "text-spotify-green"}`}
-                  >
-                    Creator
                   </button>
                 </div>
               </div>

@@ -28,6 +28,7 @@ type PlaybackType = {
 
 export default function Player({ token }: PlayerProps) {
   const [playback, setPlayback] = useState<PlaybackType | null>(null);
+
   const fetchPlayback = () => {
     fetch("https://api.spotify.com/v1/me/player", {
       method: "GET",
@@ -138,12 +139,18 @@ export default function Player({ token }: PlayerProps) {
         </div>
         <div className="flex justify-center items-center gap-2 text-xs font-medium text-spotify-subtle">
           <span>{format(playback?.progress)}</span>
-          <div className="w-[80%] h-1 rounded-full bg-[#4d4d4d] group">
-            <div className="h-full w-0 rounded-full bg-white group-hover:bg-spotify-green relative">
-              {playback?.track && (
+          <div className="w-[80%] h-1 mx-0.5 rounded-full bg-[#4d4d4d] group">
+            {playback?.track && (
+              <div
+                className="h-full w-0 rounded-full bg-white group-hover:bg-spotify-green relative"
+                style={{
+                  width:
+                    (playback.progress / playback.track.duration) * 100 + "%",
+                }}
+              >
                 <div className="hidden group-hover:block size-3 rounded-full bg-white absolute -top-1 -right-1.5" />
-              )}
-            </div>
+              </div>
+            )}
           </div>
           <span className="text-nowrap whitespace-nowrap">
             {format(playback?.track.duration)}

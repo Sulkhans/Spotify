@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { UserType } from "@/utils/types";
 import Link from "next/link";
 import Home from "@/assets/home.svg";
+import HomeFilled from "@/assets/homeFilled.svg";
 import Search from "@/assets/search.svg";
 import LibraryFull from "@/assets/libraryFilled.svg";
 import Library from "@/assets/library.svg";
@@ -149,10 +150,11 @@ export default function Sidebar({ token, user }: SidebarProps) {
           className={`flex gap-5 px-3 py-1 group hover:text-white transition-all duration-500 
           ${path === "/home" && "text-white"}`}
         >
-          <Home
-            className={`w-6 h-6 group-hover:fill-white transition-all duration-500
-            ${path === "/home" ? "fill-white" : "fill-spotify-subtle"}`}
-          />
+          {path === "/home" ? (
+            <HomeFilled className="w-6 h-6 fill-white" />
+          ) : (
+            <Home className="w-6 h-6 fill-spotify-subtle group-hover:fill-white transition-all duration-500" />
+          )}
           {full && <span>Home</span>}
         </Link>
         <Link

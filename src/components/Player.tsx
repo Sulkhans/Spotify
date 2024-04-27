@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { ArtistsType } from "@/utils/types";
 import Previous from "@/assets/previous.svg";
 import Next from "@/assets/next.svg";
@@ -8,6 +9,9 @@ import Pause from "@/assets/pause.svg";
 import Play from "@/assets/play.svg";
 import Shuffle from "@/assets/shuffle.svg";
 import Repeat from "@/assets/repeat.svg";
+import Queue from "@/assets/queue.svg";
+import Devices from "@/assets/device.svg";
+import Volume from "@/assets/volume.svg";
 
 type PlayerProps = {
   token: string | null;
@@ -28,6 +32,8 @@ type PlaybackType = {
 
 export default function Player({ token }: PlayerProps) {
   const [playback, setPlayback] = useState<PlaybackType | null>(null);
+  const path = usePathname();
+  const router = useRouter();
 
   const fetchPlayback = () => {
     fetch("https://api.spotify.com/v1/me/player", {
@@ -60,6 +66,25 @@ export default function Player({ token }: PlayerProps) {
     if (token) fetchPlayback();
   }, [token]);
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (playback && playback.is_playing) {
+      if (playback.progress < playback.track.duration - 1000) {
+        interval = setInterval(() => {
+          setPlayback((prev) =>
+            prev ? { ...prev, progress: prev.progress + 1000 } : null
+          );
+        }, 1000);
+      } else fetchPlayback();
+    }
+    return () => clearInterval(interval);
+  }, [playback]);
+
+  const handleQueue = () => {
+    if (path === "/queue") router.back();
+    else router.push("/queue");
+  };
+
   const format = (ms: any) => {
     if (ms) {
       const min = Math.floor(ms / 60000);
@@ -80,16 +105,16 @@ export default function Player({ token }: PlayerProps) {
               src={playback?.track.image}
               className="w-14 h-14 rounded mx-2"
             />
-            <div className="ml-2 font-medium">
+            <div className="ml-2 font-medium w-[calc(100%-110px)] overflow-hidden">
               <Link
                 href={"/album/" + playback?.track.album_id}
-                className="text-sm hover:underline"
+                className="text-sm hover:underline text-nowrap"
               >
                 {playback?.track.name}
               </Link>
               <div className="flex text-xs text-spotify-gray">
                 {playback?.track.artists.map((artist, i) => (
-                  <p key={artist.id}>
+                  <p key={artist.id} className="text-nowrap">
                     {i > 0 && <span className="mr-1">,</span>}
                     <Link
                       href={"/artist/" + artist.id}
@@ -157,7 +182,36 @@ export default function Player({ token }: PlayerProps) {
           </span>
         </div>
       </div>
-      <div className="w-[30%]"></div>
+      <div className="w-[30%] flex justify-end pr-4">
+        <button className="size-8 p-2 group" onClick={handleQueue}>
+          <Queue
+            className={`fill-spotify-subtle 
+            ${playback?.track ? "group-hover:fill-white" : "opacity-35"}
+            ${path === "/queue" && "fill-spotify-green"}`}
+          />
+        </button>
+        <button className="size-8 p-2 group">
+          <Devices
+            className={`fill-spotify-subtle 
+              ${playback?.track ? "group-hover:fill-white" : "opacity-35"}`}
+          />
+        </button>
+        <div className="flex items-center">
+          <button className="size-8 p-2 group">
+            <Volume
+              className={`fill-spotify-subtle 
+              ${playback?.track ? "group-hover:fill-white" : "opacity-35"}`}
+            />
+          </button>
+          <div className="w-20 h-1 mx-0.5 rounded-full bg-[#4d4d4d] group">
+            {playback?.track && (
+              <div className="h-full w-full rounded-full bg-white group-hover:bg-spotify-green relative">
+                <div className="hidden group-hover:block size-3 rounded-full bg-white absolute -top-1 -right-1.5" />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </footer>
   );
 }

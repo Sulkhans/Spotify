@@ -90,6 +90,41 @@ export default function Player({
     return () => clearInterval(interval);
   }, [playback]);
 
+  const pausePlayback = () => {
+    fetch("https://api.spotify.com/v1/me/player/pause", {
+      method: "PUT",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    }).catch((err) => console.error(err));
+    setPlayback((prev) => (prev ? { ...prev, is_playing: false } : null));
+  };
+
+  const skipToNext = () => {
+    fetch("https://api.spotify.com/v1/me/player/next", {
+      method: "PUT",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    })
+      .then(() => fetchPlayback())
+      .catch((err) => console.error(err));
+  };
+
+  const skipToPrevious = () => {
+    fetch("https://api.spotify.com/v1/me/player/previous", {
+      method: "PUT",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+    })
+      .then(() => fetchPlayback())
+      .catch((err) => console.error(err));
+  };
+
   const format = (ms: any) => {
     if (ms) {
       const min = Math.floor(ms / 60000);
@@ -142,19 +177,29 @@ export default function Player({
               ${playback?.track ? "group-hover:fill-white" : "opacity-35"}`}
             />
           </button>
-          <button className="size-8 p-2 ml-2 group">
+          <button onClick={skipToPrevious} className="size-8 p-2 ml-2 group">
             <Previous
               className={`fill-spotify-subtle 
               ${playback?.track ? "group-hover:fill-white" : "opacity-35"}`}
             />
-          </button>
-          <button
-            className={`size-8 p-2 mx-4 bg-white rounded-full hover:scale-105
-            ${!playback?.track && "opacity-35"}`}
-          >
-            {playback?.is_playing ? <Pause /> : <Play />}
-          </button>
-          <button className="size-8 p-2 mr-2 group">
+          </button>{" "}
+          {playback?.is_playing ? (
+            <button
+              className={`size-8 p-2 mx-4 bg-white rounded-full hover:scale-105
+              ${!playback?.track && "opacity-35"}`}
+              onClick={pausePlayback}
+            >
+              <Pause />
+            </button>
+          ) : (
+            <button
+              className={`size-8 p-2 mx-4 bg-white rounded-full hover:scale-105
+              ${!playback?.track && "opacity-35"}`}
+            >
+              <Play />
+            </button>
+          )}
+          <button onClick={skipToNext} className="size-8 p-2 mr-2 group">
             <Next
               className={`fill-spotify-subtle 
               ${playback?.track ? "group-hover:fill-white" : "opacity-35"}`}

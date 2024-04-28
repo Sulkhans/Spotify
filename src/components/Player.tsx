@@ -1,8 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { ArtistsType } from "@/utils/types";
+import { ArtistsType, TracksType } from "@/utils/types";
 import Previous from "@/assets/previous.svg";
 import Next from "@/assets/next.svg";
 import Pause from "@/assets/pause.svg";
@@ -15,6 +14,10 @@ import Volume from "@/assets/volume.svg";
 
 type PlayerProps = {
   token: string | null;
+  showQueue: boolean;
+  setShowQueue: React.Dispatch<React.SetStateAction<boolean>>;
+  queue: TracksType[] | null;
+  setQueue: React.Dispatch<React.SetStateAction<TracksType[] | null>>;
 };
 
 type PlaybackType = {
@@ -30,10 +33,14 @@ type PlaybackType = {
   };
 };
 
-export default function Player({ token }: PlayerProps) {
+export default function Player({
+  token,
+  showQueue,
+  setShowQueue,
+  queue,
+  setQueue,
+}: PlayerProps) {
   const [playback, setPlayback] = useState<PlaybackType | null>(null);
-  const path = usePathname();
-  const router = useRouter();
 
   const fetchPlayback = () => {
     fetch("https://api.spotify.com/v1/me/player", {
@@ -75,15 +82,13 @@ export default function Player({ token }: PlayerProps) {
             prev ? { ...prev, progress: prev.progress + 1000 } : null
           );
         }, 1000);
-      } else fetchPlayback();
+      } else {
+        fetchPlayback();
+        if (queue) setQueue(() => queue.slice(1));
+      }
     }
     return () => clearInterval(interval);
   }, [playback]);
-
-  const handleQueue = () => {
-    if (path === "/queue") router.back();
-    else router.push("/queue");
-  };
 
   const format = (ms: any) => {
     if (ms) {
@@ -183,11 +188,16 @@ export default function Player({ token }: PlayerProps) {
         </div>
       </div>
       <div className="w-[30%] flex justify-end pr-4">
-        <button className="size-8 p-2 group" onClick={handleQueue}>
+        <button
+          className="size-8 p-2 group"
+          onClick={() => setShowQueue(!showQueue)}
+        >
           <Queue
-            className={`fill-spotify-subtle 
-            ${playback?.track ? "group-hover:fill-white" : "opacity-35"}
-            ${path === "/queue" && "fill-spotify-green"}`}
+            className={
+              showQueue
+                ? "fill-spotify-green"
+                : "fill-spotify-subtle group-hover:fill-white"
+            }
           />
         </button>
         <button className="size-8 p-2 group">

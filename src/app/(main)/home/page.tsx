@@ -70,12 +70,12 @@ export default function Home() {
             {filteredAlbums.slice(0, 8).map((track) => (
               <div
                 key={track.album.id}
-                onMouseEnter={(url) => getColor(track.image)}
+                onMouseEnter={() => getColor(track.image)}
                 onClick={() => router.push("/album/" + track.album.id)}
                 className="rounded overflow-hidden bg-[#ffffff12] hover:bg-[#ffffff33] flex gap-3 items-center transition-all"
               >
                 <img src={track.image} className="size-12 lg:size-14" />
-                <p className="line-clamp-2">{track.album.name}</p>
+                <p className="line-clamp-2 mr-2">{track.album.name}</p>
               </div>
             ))}
           </section>

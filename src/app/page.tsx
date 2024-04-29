@@ -47,7 +47,8 @@ export default function Auth() {
   const handleConnect = () => {
     const url = "https://accounts.spotify.com/authorize";
     const clientID = "8152586828ad44c49d71071b08e811b2";
-    const redirectURL = "http://localhost:3000";
+    const redirectURL =
+      "https://spotify-gsufz7mp7-sulkhans-projects.vercel.app";
     const scope = [
       "playlist-modify-private",
       "playlist-modify-public",

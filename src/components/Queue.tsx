@@ -10,7 +10,7 @@ type queueProps = {
 
 export default function Queue({ queue, setQueue }: queueProps) {
   return (
-    <div className="min-w-72 2xl:min-w-80 bg-spotify-base rounded-lg">
+    <div className="min-w-72 2xl:min-w-80 ml-2 bg-spotify-base rounded-lg">
       <h1 className="px-4 py-2 font-bold my-3">Queue</h1>
       <div className="p-2 pt-0 h-[calc(100%-64px)] overflow-y-auto hide-scrollbar">
         {queue ? (

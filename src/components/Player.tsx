@@ -74,6 +74,17 @@ export default function Player({
   }, [token]);
 
   useEffect(() => {
+    if (playback?.track)
+      document.title =
+        playback.track.name +
+        " • " +
+        playback.track.artists.map((artist) => " " + artist.name);
+    return () => {
+      document.title = "Spotify";
+    };
+  }, [playback]);
+
+  useEffect(() => {
     let interval: NodeJS.Timeout;
     if (playback && playback.is_playing) {
       if (playback.progress < playback.track.duration - 1000) {

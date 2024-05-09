@@ -6,6 +6,7 @@ html {
   background-color: #121212;
   color: #fff;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  scrollbar-width: none;
 }
 button,
 input {

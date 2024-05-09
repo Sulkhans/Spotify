@@ -75,12 +75,12 @@ export default function MainLayout({
   }, []);
 
   return (
-    <div className="w-screen h-[100dvh] p-2 flex flex-col gap-2 bg-black overflow-x-auto select-none">
+    <div className="w-screen h-[100dvh] min-w-[700px] p-2 flex flex-col gap-2 bg-black overflow-x-auto select-none">
       <div className="flex h-[calc(100%-80px)]">
         <Sidebar token={token} user={user} />
         <div className="w-full h-full rounded-lg relative bg-spotify-base overflow-hidden">
           <header
-            className={`absolute w-full flex justify-between py-4 px-6 z-50 transition-all duration-300
+            className={`absolute w-full flex justify-between py-4 px-6 rounded-t-lg z-50 transition-all duration-300
             ${isScrolled && "bg-spotify-base"}`}
           >
             <div>

@@ -98,14 +98,14 @@ export default function Album({ params }: { params: { id: string } }) {
     <div>
       <div style={{ backgroundColor: color ? color.hex : "" }}>
         <div
-          className="flex flex-col items-center sm:flex-row sm:items-end p-6 pt-20"
+          className="flex items-end p-6 pt-20"
           style={{
             background: "linear-gradient(transparent 0%, rgba(0,0,0,0.5) 95%)",
           }}
         >
           <img
             src={album.image}
-            className="rounded mb-4 sm:mr-6 sm:mb-0 size-40 md:size-44 lg:size-56"
+            className="rounded mr-6 size-40 md:size-44 lg:size-56"
             style={{ boxShadow: "0 4px 60px rgba(0,0,0,.5)" }}
           />
           <div>

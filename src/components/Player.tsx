@@ -31,6 +31,8 @@ type PlaybackType = {
     artists: ArtistsType[];
     album_id: string;
   };
+  shuffle: boolean;
+  repeat: boolean;
 };
 
 export default function Player({
@@ -48,24 +50,28 @@ export default function Player({
       headers: { Authorization: "Bearer " + token },
     })
       .then((res) => res.json())
-      .then(({ is_playing, progress_ms, item }) => {
-        let artists: any = [];
-        item.artists.forEach((artist: any) =>
-          artists.push({ id: artist.id, name: artist.name })
-        );
-        setPlayback({
-          is_playing,
-          progress: progress_ms,
-          track: {
-            id: item.id,
-            name: item.name,
-            image: item.album.images[2].url,
-            duration: item.duration_ms,
-            artists,
-            album_id: item.album.id,
-          },
-        });
-      })
+      .then(
+        ({ is_playing, progress_ms, item, shuffle_state, repeat_state }) => {
+          let artists: any = [];
+          item.artists.forEach((artist: any) =>
+            artists.push({ id: artist.id, name: artist.name })
+          );
+          setPlayback({
+            is_playing,
+            progress: progress_ms,
+            track: {
+              id: item.id,
+              name: item.name,
+              image: item.album.images[2].url,
+              duration: item.duration_ms,
+              artists,
+              album_id: item.album.id,
+            },
+            shuffle: shuffle_state,
+            repeat: repeat_state === "off" ? false : true,
+          });
+        }
+      )
       .catch((err) => console.error(err));
   };
 
@@ -184,8 +190,13 @@ export default function Player({
         <div className="flex mb-2 m-auto">
           <button className="size-8 p-2 group">
             <Shuffle
-              className={`fill-spotify-subtle 
-              ${playback?.track ? "group-hover:fill-white" : "opacity-35"}`}
+              className={
+                playback?.track
+                  ? playback?.shuffle
+                    ? "fill-spotify-green"
+                    : "fill-spotify-subtle group-hover:fill-white"
+                  : "opacity-35"
+              }
             />
           </button>
           <button onClick={skipToPrevious} className="size-8 p-2 ml-2 group">
@@ -193,7 +204,7 @@ export default function Player({
               className={`fill-spotify-subtle 
               ${playback?.track ? "group-hover:fill-white" : "opacity-35"}`}
             />
-          </button>{" "}
+          </button>
           {playback?.is_playing ? (
             <button
               className={`size-8 p-2 mx-4 bg-white rounded-full hover:scale-105
@@ -218,8 +229,13 @@ export default function Player({
           </button>
           <button className="size-8 p-2 group">
             <Repeat
-              className={`fill-spotify-subtle 
-              ${playback?.track ? "group-hover:fill-white" : "opacity-35"}`}
+              className={
+                playback?.track
+                  ? playback?.shuffle
+                    ? "fill-spotify-green"
+                    : "fill-spotify-subtle group-hover:fill-white"
+                  : "opacity-35"
+              }
             />
           </button>
         </div>

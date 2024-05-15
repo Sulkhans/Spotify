@@ -195,7 +195,7 @@ export default function Player({
                   ? playback?.shuffle
                     ? "fill-spotify-green"
                     : "fill-spotify-subtle group-hover:fill-white"
-                  : "opacity-35"
+                  : "fill-spotify-subtle opacity-35"
               }
             />
           </button>
@@ -234,7 +234,7 @@ export default function Player({
                   ? playback?.shuffle
                     ? "fill-spotify-green"
                     : "fill-spotify-subtle group-hover:fill-white"
-                  : "opacity-35"
+                  : "fill-spotify-subtle opacity-35"
               }
             />
           </button>

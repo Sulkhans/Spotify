@@ -1,14 +1,8 @@
 type ResizerProps = {
-  minWidth: number;
-  maxWidth: number;
   setWidth: React.Dispatch<React.SetStateAction<number>>;
 };
 
-export default function Resizer({
-  minWidth,
-  maxWidth,
-  setWidth,
-}: ResizerProps) {
+export default function Resizer({ setWidth }: ResizerProps) {
   const handleMouseDown = () => {
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
@@ -19,7 +13,9 @@ export default function Resizer({
   };
   const handleMouseMove = (e: MouseEvent) => {
     const newWidth = e.clientX - 10;
-    if (newWidth >= minWidth && newWidth <= maxWidth) setWidth(newWidth);
+    if (newWidth >= 280 && newWidth <= 420) {
+      setWidth(newWidth);
+    } else if (newWidth <= 80) setWidth(72);
   };
   return (
     <div

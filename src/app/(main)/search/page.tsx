@@ -111,7 +111,7 @@ export default function Search() {
   };
 
   return (
-    <div className="pt-16">
+    <div className="pt-16 pb-3.5">
       <div className="flex items-center max-w-96 p-3.5 ml-6 mb-4 bg-[#242424] hover:bg-[#2a2a2a] rounded-full group focus-within:ring-2 ring-white">
         <SearchSVG className="w-5 h-5 fill-spotify-subtle group-hover:fill-white group-focus-within:fill-white" />
         <input

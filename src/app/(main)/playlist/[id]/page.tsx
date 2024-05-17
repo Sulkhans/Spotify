@@ -46,7 +46,7 @@ export default function Playlist({ params }: { params: { id: string } }) {
   }, []);
 
   useEffect(() => {
-    if (playlist) {
+    if (playlist?.image) {
       const fac = new FastAverageColor();
       fac.getColorAsync(playlist.image).then((color) => setColor(color));
     }
@@ -153,7 +153,7 @@ export default function Playlist({ params }: { params: { id: string } }) {
             onClick={playPlaylist}
             className="size-14 rounded-full bg-spotify-green hover:scale-105"
           >
-            <Play className="size-6 m-auto" />
+            <Play className="size-5 m-auto" />
           </button>
         </div>
         <div className="mb-4 pt-5 px-6 relative">
@@ -174,13 +174,13 @@ export default function Playlist({ params }: { params: { id: string } }) {
             >
               <p className="place-self-center font-medium">{i + 1}</p>
               <img src={track.image} className="rounded" />
-              <div>
+              <div className="overflow-hidden">
                 <p className="leading-[22px] text-white line-clamp-1">
                   {track.name}
                 </p>
                 <div className="flex text-sm">
                   {track.artists.map((artist, i) => (
-                    <p key={artist.id}>
+                    <p key={artist.id} className="whitespace-nowrap">
                       {i > 0 && <span className="mr-1">,</span>}
                       <Link
                         href={"/artist/" + artist.id}

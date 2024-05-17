@@ -1,14 +1,18 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useLibrary } from "@/context/libraryContext";
 import { FastAverageColor } from "fast-average-color";
 import { AlbumType } from "@/utils/types";
 import { getToken } from "@/utils/cookie";
 import Loading from "@/components/Loading";
 import Time from "@/assets/time.svg";
 import Play from "@/assets/play.svg";
+import Save from "@/assets/save.svg";
+import Saved from "@/assets/saved.svg";
 
 export default function Album({ params }: { params: { id: string } }) {
+  const { data, setData } = useLibrary();
   const [album, setAlbum] = useState<AlbumType | null>(null);
   const [color, setColor] = useState<any>(null);
   const token = getToken();
@@ -94,6 +98,50 @@ export default function Album({ params }: { params: { id: string } }) {
     }).catch((err) => console.error(err));
   };
 
+  const saveAlbum = () => {
+    fetch(`https://api.spotify.com/v1/me/albums?ids=${album?.id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ids: [album?.id] }),
+    })
+      .then(() =>
+        setData((prev) => ({
+          ...prev,
+          albums: [
+            ...prev.albums,
+            {
+              id: album!.id,
+              name: album!.name,
+              artist: album!.artists[0].name,
+              image: album!.image,
+            },
+          ],
+        }))
+      )
+      .catch((err) => console.error(err));
+  };
+
+  const removeAlbum = () => {
+    fetch(`https://api.spotify.com/v1/me/albums?ids=${album?.id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ids: [album?.id] }),
+    })
+      .then(() =>
+        setData((prev) => ({
+          ...prev,
+          albums: prev.albums.filter((item) => item.id !== album!.id),
+        }))
+      )
+      .catch((err) => console.error(err));
+  };
+
   return album ? (
     <div>
       <div style={{ backgroundColor: color ? color.hex : "" }}>
@@ -144,13 +192,22 @@ export default function Album({ params }: { params: { id: string } }) {
             }}
           />
         </div>
-        <div className="relative p-6 pb-2">
+        <div className="relative flex items-center gap-7 p-6 pb-2">
           <button
             onClick={playAlbum}
             className="size-14 rounded-full bg-spotify-green hover:scale-105"
           >
-            <Play className="size-6 m-auto" />
+            <Play className="size-5 m-auto" />
           </button>
+          {data.albums.some((i) => i.id === album.id) ? (
+            <button onClick={removeAlbum} className="size-8 hover:scale-105">
+              <Saved className="size-8 fill-spotify-green" />
+            </button>
+          ) : (
+            <button onClick={saveAlbum} className="size-8 hover:scale-105">
+              <Save className="size-8 fill-spotify-gray hover:fill-white" />
+            </button>
+          )}
         </div>
         <div className="mb-4 pt-5 px-6 relative">
           <div className="grid grid-cols-[16px_1fr_16px] gap-4 items-center h-9 pl-4 pr-12 text-spotify-gray font-medium">
@@ -169,13 +226,13 @@ export default function Album({ params }: { params: { id: string } }) {
               <p className="place-self-center font-medium">
                 {track.track_number}
               </p>
-              <div>
+              <div className="overflow-hidden">
                 <p className="leading-[22px] text-white line-clamp-1">
                   {track.name}
                 </p>
                 <div className="flex text-sm">
                   {track.artists.map((artist, i) => (
-                    <p key={artist.id}>
+                    <p key={artist.id} className="whitespace-nowrap">
                       {i > 0 && <span className="mr-1">,</span>}
                       <Link
                         href={"/artist/" + artist.id}

@@ -1,6 +1,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { AlbumType, PlaylistType, useLibrary } from "@/context/libraryContext";
 import { UserType } from "@/utils/types";
 import Link from "next/link";
 import Resizer from "./Resizer";
@@ -18,27 +19,10 @@ type SidebarProps = {
   user: UserType | null;
 };
 
-type PlaylistType = {
-  id: string;
-  name: string;
-  image: string;
-  owner: string;
-};
-
-type AlbumType = {
-  id: string;
-  name: string;
-  image: string;
-  artist: string;
-};
-
 export default function Sidebar({ token, user }: SidebarProps) {
   const path = usePathname();
+  const { data, setData } = useLibrary();
   const [width, setWidth] = useState(280);
-  const [data, setData] = useState<{
-    playlists: PlaylistType[];
-    albums: AlbumType[];
-  }>({ playlists: [], albums: [] });
   const [playlists, setPlaylists] = useState<Array<PlaylistType>>([]);
   const [albums, setAlbums] = useState<Array<AlbumType>>([]);
   const [sortBy, setSortBy] = useState("Recents");
@@ -97,7 +81,7 @@ export default function Sidebar({ token, user }: SidebarProps) {
   }, [token]);
 
   const createNewPlaylist = () => {
-    if (user) {
+    if (user && token) {
       const body = {
         name: "New Playlist",
         description: "",
@@ -127,7 +111,7 @@ export default function Sidebar({ token, user }: SidebarProps) {
         album.name.toLowerCase().includes(search.toLowerCase())
       )
     );
-  }, [search]);
+  }, [search, data]);
 
   useMemo(() => {
     const { playlists, albums } = data;
@@ -310,7 +294,7 @@ export default function Sidebar({ token, user }: SidebarProps) {
           </div>
         </div>
       </aside>
-      <Resizer minWidth={280} maxWidth={420} setWidth={setWidth} />
+      <Resizer setWidth={setWidth} />
     </div>
   );
 }

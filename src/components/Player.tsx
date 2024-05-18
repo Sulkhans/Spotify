@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { ArtistsType, TracksType } from "@/utils/types";
+import { useEffect } from "react";
+import { usePlayback } from "@/context/playbackContext";
 import Previous from "@/assets/previous.svg";
 import Next from "@/assets/next.svg";
 import Pause from "@/assets/pause.svg";
@@ -16,33 +16,14 @@ type PlayerProps = {
   token: string | null;
   showQueue: boolean;
   setShowQueue: React.Dispatch<React.SetStateAction<boolean>>;
-  queue: TracksType[] | null;
-  setQueue: React.Dispatch<React.SetStateAction<TracksType[] | null>>;
-};
-
-type PlaybackType = {
-  is_playing: boolean;
-  progress: number;
-  track: {
-    id: string;
-    name: string;
-    image: string;
-    duration: number;
-    artists: ArtistsType[];
-    album_id: string;
-  };
-  shuffle: boolean;
-  repeat: boolean;
 };
 
 export default function Player({
   token,
   showQueue,
   setShowQueue,
-  queue,
-  setQueue,
 }: PlayerProps) {
-  const [playback, setPlayback] = useState<PlaybackType | null>(null);
+  const { playback, setPlayback, queue, setQueue } = usePlayback();
 
   const fetchPlayback = () => {
     fetch("https://api.spotify.com/v1/me/player", {
@@ -108,38 +89,80 @@ export default function Player({
   }, [playback]);
 
   const pausePlayback = () => {
-    fetch("https://api.spotify.com/v1/me/player/pause", {
-      method: "PUT",
-      headers: {
-        Authorization: "Bearer " + token,
-        "Content-Type": "application/json",
-      },
-    }).catch((err) => console.error(err));
-    setPlayback((prev) => (prev ? { ...prev, is_playing: false } : null));
+    if (playback) {
+      fetch("https://api.spotify.com/v1/me/player/pause", {
+        method: "PUT",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      }).catch((err) => console.error(err));
+      setPlayback((prev) => (prev ? { ...prev, is_playing: false } : null));
+    }
+  };
+
+  const resumePlayback = () => {
+    if (playback) {
+      fetch("https://api.spotify.com/v1/me/player/play", {
+        method: "PUT",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      })
+        .then(() =>
+          setPlayback((prev) => (prev ? { ...prev, is_playing: true } : null))
+        )
+        .catch((err) => console.error(err));
+    }
   };
 
   const skipToNext = () => {
-    fetch("https://api.spotify.com/v1/me/player/next", {
-      method: "PUT",
-      headers: {
-        Authorization: "Bearer " + token,
-        "Content-Type": "application/json",
-      },
-    })
-      .then(() => fetchPlayback())
-      .catch((err) => console.error(err));
+    if (playback) {
+      fetch("https://api.spotify.com/v1/me/player/next", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      })
+        .then(() => {
+          if (queue) {
+            const track = queue[0];
+            setPlayback((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    is_playing: true,
+                    progress: 0,
+                    track: {
+                      id: track.id,
+                      name: track.name,
+                      artists: track.artists,
+                      album_id: track.album.id,
+                      image: track.image,
+                      duration: track.duration,
+                    },
+                  }
+                : null
+            );
+            setQueue(() => queue.slice(1));
+          }
+        })
+        .catch((err) => console.error(err));
+    }
   };
 
   const skipToPrevious = () => {
-    fetch("https://api.spotify.com/v1/me/player/previous", {
-      method: "PUT",
-      headers: {
-        Authorization: "Bearer " + token,
-        "Content-Type": "application/json",
-      },
-    })
-      .then(() => fetchPlayback())
-      .catch((err) => console.error(err));
+    if (playback) {
+      fetch("https://api.spotify.com/v1/me/player/previous", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      }).catch((err) => console.error(err));
+    }
   };
 
   const format = (ms: any) => {
@@ -217,6 +240,7 @@ export default function Player({
             <button
               className={`size-8 p-2 mx-4 bg-white rounded-full hover:scale-105
               ${!playback?.track && "opacity-35"}`}
+              onClick={resumePlayback}
             >
               <Play />
             </button>

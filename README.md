@@ -16,7 +16,7 @@ A clone of the Spotify Web Player built using Next.js, Tailwind CSS, the Spotify
 - **[Tailwind CSS](https://tailwindcss.com/):** Utility-first CSS framework for styling.
 - **[Spotify Web API](https://developer.spotify.com/documentation/web-api/):** Official API provided by Spotify for accessing Spotify's data and features.
 - **[Fast Average Color](https://github.com/fast-average-color/fast-average-color):** Library for extracting the dominant color from an image.
-
+- **Context API:** React's built-in way to manage global state in the application.
 
 ## Color Palette
 
@@ -30,24 +30,28 @@ Below are the primary colors used in this project:
 - **Gray:** #a7a7a7
 - **Green:** #1ed760
 
-
 ## Setup
 
 To set up the project locally, follow these steps:
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/Sulkhans/Spotify.git
 ```
+
 2. Install dependencies:
+
 ```bash
 npm install
 ```
+
 3. Set up Spotify Developer account and create an application to obtain API keys.
 
 4. Start the development server:
+
 ```bash
 npm run dev
 ```
-5. Visit `http://localhost:3000` in your browser to access the application.
 
+5. Visit `http://localhost:3000` in your browser to access the application.

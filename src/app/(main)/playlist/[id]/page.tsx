@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { usePlayback } from "@/context/playbackContext";
 import { FastAverageColor } from "fast-average-color";
 import { PlaylistType } from "@/utils/types";
 import { getToken } from "@/utils/cookie";
@@ -10,6 +11,7 @@ import Note from "@/assets/note.svg";
 import Play from "@/assets/play.svg";
 
 export default function Playlist({ params }: { params: { id: string } }) {
+  const { setQueue } = usePlayback();
   const [playlist, setPlaylist] = useState<PlaylistType | null>(null);
   const [color, setColor] = useState<any>(null);
   const token = getToken();
@@ -99,6 +101,35 @@ export default function Playlist({ params }: { params: { id: string } }) {
     }).catch((err) => console.error(err));
   };
 
+  const addTrackToQueue = (i: number) => {
+    const track = playlist?.tracks[i];
+    fetch(
+      `https://api.spotify.com/v1/me/player/queue?uri=spotify%3Atrack%3A${track?.id}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then(() => {
+        setQueue((prev) => {
+          const q = prev;
+          q?.unshift({
+            id: track!.id,
+            name: track!.name,
+            artists: track!.artists,
+            duration: track!.duration,
+            album: { id: track!.album!.id, name: track!.album!.name },
+            image: track!.image,
+          });
+          return q;
+        });
+      })
+      .catch((err) => console.error(err));
+  };
+
   return playlist ? (
     <div>
       <div style={{ backgroundColor: color ? color.hex : "" }}>
@@ -170,6 +201,7 @@ export default function Playlist({ params }: { params: { id: string } }) {
           {playlist.tracks.map((track, i) => (
             <div
               key={i}
+              onDoubleClick={() => addTrackToQueue(i)}
               className="grid grid-cols-[16px_40px_minmax(200px,1fr)_40px] lg:grid-cols-[16px_40px_2fr_1fr_88px_1fr] gap-4 h-14 items-center rounded pl-4 pr-12 text-spotify-gray hover:bg-white hover:bg-opacity-10"
             >
               <p className="place-self-center font-medium">{i + 1}</p>

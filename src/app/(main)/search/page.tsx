@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { usePlayback } from "@/context/playbackContext";
 import { getToken } from "@/utils/cookie";
 import { ArtistsType } from "@/utils/types";
 import SearchSVG from "@/assets/search.svg";
@@ -28,6 +29,7 @@ type TrackType = {
   id: string;
   name: string;
   artists: ArtistsType[];
+  album: { id: string; name: string };
   image: string;
   duration: number;
 };
@@ -46,6 +48,7 @@ type resultsType = {
 };
 
 export default function Search() {
+  const { setQueue } = usePlayback();
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [results, setResults] = useState<resultsType | null>(null);
@@ -76,6 +79,10 @@ export default function Search() {
             id: track.id,
             name: track.name,
             artists: track.artists,
+            album: {
+              id: track.album.id,
+              name: track.album.name,
+            },
             image: track.album.images[2].url,
             duration: track.duration_ms,
           }));
@@ -101,6 +108,37 @@ export default function Search() {
         .finally(() => setLoading(false));
     } else setResults(null);
   }, [search]);
+
+  const addTrackToQueue = (i: number) => {
+    if (results?.tracks) {
+      const track = results.tracks[i];
+      fetch(
+        `https://api.spotify.com/v1/me/player/queue?uri=spotify%3Atrack%3A${track.id}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + token,
+            "Content-Type": "application/json",
+          },
+        }
+      )
+        .then(() => {
+          setQueue((prev) => {
+            const q = prev;
+            q?.unshift({
+              id: track.id,
+              name: track.name,
+              artists: track.artists,
+              duration: track.duration,
+              album: { id: track.album.id, name: track.album.name },
+              image: track.image,
+            });
+            return q;
+          });
+        })
+        .catch((err) => console.error(err));
+    }
+  };
 
   const format = (ms: number) => {
     const min = Math.floor(ms / 60000);
@@ -129,9 +167,10 @@ export default function Search() {
             Songs
           </h1>
           <div>
-            {results.tracks.map((track) => (
+            {results.tracks.map((track, i) => (
               <div
                 key={track.id}
+                onDoubleClick={() => addTrackToQueue(i)}
                 className="flex justify-between items-center p-2 hover:bg-spotify-elevated-highlight rounded group"
               >
                 <div className="flex items-end">

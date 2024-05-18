@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { getToken, removeToken } from "@/utils/cookie";
-import { TracksType, UserType } from "@/utils/types";
+import { UserType } from "@/utils/types";
 import Player from "@/components/Player";
 import Sidebar from "@/components/Sidebar";
 import Queue from "@/components/Queue";
@@ -17,7 +17,6 @@ export default function MainLayout({
   const route = useRouter();
   const token = getToken();
   const [user, setUser] = useState<UserType | null>(null);
-  const [queue, setQueue] = useState<TracksType[] | null>(null);
   const [showQueue, setShowQueue] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -32,25 +31,6 @@ export default function MainLayout({
         .then(({ id, display_name, email, images }) =>
           setUser({ id, name: display_name, email, image: images[1].url })
         )
-        .catch((err) => console.error(err));
-      fetch("https://api.spotify.com/v1/me/player/queue", {
-        method: "GET",
-        headers: { Authorization: "Bearer " + token },
-      })
-        .then((res) => res.json())
-        .then((json) => {
-          if (json.queue) {
-            const q = json.queue.map((item: any) => ({
-              id: item.id,
-              name: item.name,
-              duration: item.duration_ms,
-              artists: item.artists,
-              image: item.album.images[2].url,
-              album: { id: item.album.id, name: item.album.name },
-            }));
-            setQueue(q);
-          } else console.log("Spotify Premium only");
-        })
         .catch((err) => console.error(err));
     }
   }, [token]);
@@ -142,15 +122,11 @@ export default function MainLayout({
             {children}
           </main>
         </div>
-        {showQueue && <Queue queue={queue} setQueue={setQueue} />}
+        <aside className={showQueue ? "flex" : "hidden"}>
+          <Queue token={token} />
+        </aside>
       </div>
-      <Player
-        token={token}
-        showQueue={showQueue}
-        setShowQueue={setShowQueue}
-        queue={queue}
-        setQueue={setQueue}
-      />
+      <Player token={token} showQueue={showQueue} setShowQueue={setShowQueue} />
     </div>
   );
 }

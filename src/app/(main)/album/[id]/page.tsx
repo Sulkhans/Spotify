@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useLibrary } from "@/context/libraryContext";
+import { usePlayback } from "@/context/playbackContext";
 import { FastAverageColor } from "fast-average-color";
 import { AlbumType } from "@/utils/types";
 import { getToken } from "@/utils/cookie";
@@ -13,6 +14,7 @@ import Saved from "@/assets/saved.svg";
 
 export default function Album({ params }: { params: { id: string } }) {
   const { data, setData } = useLibrary();
+  const { setQueue } = usePlayback();
   const [album, setAlbum] = useState<AlbumType | null>(null);
   const [color, setColor] = useState<any>(null);
   const token = getToken();
@@ -142,6 +144,35 @@ export default function Album({ params }: { params: { id: string } }) {
       .catch((err) => console.error(err));
   };
 
+  const addTrackToQueue = (i: number) => {
+    const track = album?.tracks[i];
+    fetch(
+      `https://api.spotify.com/v1/me/player/queue?uri=spotify%3Atrack%3A${track?.id}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then(() => {
+        setQueue((prev) => {
+          const q = prev;
+          q?.unshift({
+            id: track!.id,
+            name: track!.name,
+            artists: track!.artists,
+            duration: track!.duration,
+            album: { id: album!.id, name: album!.name },
+            image: album!.image,
+          });
+          return q;
+        });
+      })
+      .catch((err) => console.error(err));
+  };
+
   return album ? (
     <div>
       <div style={{ backgroundColor: color ? color.hex : "" }}>
@@ -218,9 +249,10 @@ export default function Album({ params }: { params: { id: string } }) {
           <hr className="opacity-25 border-spotify-gray" />
         </div>
         <div className="relative px-6 pb-6">
-          {album.tracks.map((track) => (
+          {album.tracks.map((track, i) => (
             <div
               key={track.id}
+              onDoubleClick={() => addTrackToQueue(i)}
               className="grid grid-cols-[16px_minmax(200px,1fr)_40px] gap-4 h-14 items-center rounded pl-4 pr-12 text-spotify-gray hover:bg-white hover:bg-opacity-10"
             >
               <p className="place-self-center font-medium">

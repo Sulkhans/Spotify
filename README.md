@@ -1,6 +1,11 @@
-# Spotify Web Player Clone
+# Spotify
 
-A clone of the Spotify Web Player built using Next.js, Tailwind CSS, the Spotify Web API, and the fast-average-color library. Users can connect to their own Spotify accounts, browse their Spotify library, search for artists, albums, and playlists, and create new playlists. Some features are only available to Spotify Premium users, such as viewing the song queue and using playback.
+A clone of the Spotify Web Player built using Next.js, Tailwind CSS, the Spotify Web API, and the fast-average-color library. Users can connect to their own Spotify accounts, browse their Spotify library, search for artists, albums, and playlists, and create new playlists. Some features, such as viewing the song queue and using playback, are only available to Spotify Premium users.
+
+## Screenshots
+
+![Preview](./previews/1.png)
+![Preview](./previews/2.png)
 
 ## Features
 
@@ -20,7 +25,7 @@ A clone of the Spotify Web Player built using Next.js, Tailwind CSS, the Spotify
 
 ## Color Palette
 
-Below are the primary colors used in this project:
+Primary colors used in this project:
 
 - **Base:** #121212
 - **Highlight:** #1a1a1a
@@ -30,28 +35,54 @@ Below are the primary colors used in this project:
 - **Gray:** #a7a7a7
 - **Green:** #1ed760
 
-## Setup
+## Spotify API Setup
 
-To set up the project locally, follow these steps:
+1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Log in with your Spotify account
+3. Click "Create New App"
+4. Fill in the app details:
+   - App name: Your choice
+   - App description: Your choice
+   - Website: `http://localhost:3000` (for development)
+   - Redirect URI: `http://localhost:3000`
+   - Select Web API
+5. After creating the app, you'll get your `Client ID`
+6. In your app settings:
+   - Add `http://localhost:3000` to Redirect URIs
+   - Save the changes
+
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+NEXT_PUBLIC_SPOTIFY_CLIENT_ID=your_spotify_client_id
+NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=http://localhost:3000
+```
+
+## Installation
 
 1. Clone the repository:
 
 ```bash
 git clone https://github.com/Sulkhans/Spotify.git
+cd Spotify
 ```
 
 2. Install dependencies:
 
 ```bash
 npm install
+# or
+yarn install
 ```
 
-3. Set up Spotify Developer account and create an application to obtain API keys.
-
-4. Start the development server:
+3. Run the development server:
 
 ```bash
 npm run dev
+# or
+yarn dev
 ```
 
-5. Visit `http://localhost:3000` in your browser to access the application.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.

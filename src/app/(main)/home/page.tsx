@@ -15,7 +15,7 @@ export default function Home() {
 
   useEffect(() => {
     fetch(
-      "https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=30",
+      "https://api.spotify.com/v1/me/top/tracks?time_range=short_term&limit=50",
       {
         method: "GET",
         headers: { Authorization: "Bearer " + token },
